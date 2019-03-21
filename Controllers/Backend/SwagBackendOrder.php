@@ -46,6 +46,19 @@ use SwagBackendOrder\Components\Translation\ShippingTranslator;
 
 class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers_Backend_ExtJs
 {
+    
+    public function getArticleInfoAction() {
+        $ordernumber = $this->request->getParam('articleNumber');
+
+        $this->view->assign([
+            'success' => true,
+            'total' => 1,
+            'data' => [
+                'number' => $ordernumber
+            ]
+        ]);
+    }
+    
     /**
      * Return a list of customer on search or return a single customer on select.
      */

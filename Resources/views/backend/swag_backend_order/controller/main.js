@@ -517,6 +517,47 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 updateButton.setDisabled(false);
             }
         });
+
+        me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
+        me.articleInfoModel = me.articleInfoStore.getAt(0);
+
+        console.log('Editor Item', editor.editor.items.items[1]);
+
+        Ext.Ajax.request({
+            url: '{url action="getArticleInfo"}',
+            params: {
+                articleNumber: editor.editor.items.items[1]
+            },
+            success: function(response) {
+                var responseObj = Ext.JSON.decode(response.responseText),
+                    result = responseObj.data;
+
+                    console.log('Ajax Result', result);
+
+                    // instock = result.instock,
+                    // preorders = result.preorders,
+                    // orders = result.orders;
+
+                // me.articleInfoModel.beginEdit();
+
+                // me.articleInfoModel.setValue('instock', instock);
+                // me.articleInfoModel.setValue('preorders', preorders);
+                
+                // me.articleInfoModel.setValue('ordernumber1', orders[1].ordernumber);
+                // me.articleInfoModel.setValue('ordernumber2', orders[2].ordernumber);
+                // me.articleInfoModel.setValue('ordernumber3', orders[3].ordernumber);
+
+                // me.articleInfoModel.setValue('price1', orders[1].price);
+                // me.articleInfoModel.setValue('price2', orders[2].price);
+                // me.articleInfoModel.setValue('price3', orders[3].price);
+
+                // me.articleInfoModel.setValue('quantity1', orders[1].quantity);
+                // me.articleInfoModel.setValue('quantity2', orders[2].quantity);
+                // me.articleInfoModel.setValue('quantity3', orders[3].quantity);
+
+                // me.articleInfoModel.endEdit();
+            }
+        });
     },
 
     /**

@@ -34,6 +34,12 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         taxSum: '{s name="swag_backend_order/costs_overview/tax_sum"}{/s}',
         totalTaxPrefix: '{s name="cart_footer_total_tax_prefix"}{/s}',
         totalTaxSuffix: '{s name="cart_footer_total_tax_suffix"}{/s}',
+        instock: '{s name="swag_backend_order/costs_overview/instock"}{/s}',
+        preOrders: '{s name="swag_backend_order/costs_overview/pre_orders"}{/s}',
+        price: '{s name="swag_backend_order/costs_overview/price"}{/s}',
+        quantity: '{s name="swag_backend_order/costs_overview/quantity"}{/s}',
+        ordernumber: '{s name="swag_backend_order/costs_overview/ordernumber"}{/s}',
+        lastOrders: '{s name="swag_backend_order/costs_overview/last_orders"}{/s}'
     },
 
     /**
@@ -85,6 +91,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         var me = this;
 
         me.createTotalCostsStore();
+        me.createArticleInfoStore();
 
         me.totalCostsLabelsView = me.createTotalCostsLabelsView();
 
@@ -109,9 +116,96 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
             layout: 'hbox',
             items: [
                 me.createLeftContainer(),
+                me.createArticleInfoContainer(),
+                me.createLastOrdersContainer(),
                 me.totalCostsFloatContainer
             ]
         });
+    },
+
+    createArticleInfoContainer: function() {
+        var me = this;
+
+        return Ext.create('Ext.container.Container', {
+            layout: 'hbox',
+            style: {
+                marginLeft: '50px',
+            },
+            items: [
+                me.createArticleInfoView()
+            ]
+        });
+    },
+
+    createArticleInfoView: function() {
+        var me = this;
+
+
+        return Ext.create('Ext.view.View', {
+            id: 'articleInfoView',
+            name: 'articleInfoView',
+            store: me.articleInfoStore,
+            width: 150,
+            tpl: me.createArticleInfoTemplate()
+        });
+    },
+
+    createArticleInfoTemplate: function() {
+        var me = this;
+
+        me.articleInfoTemplate = new Ext.XTemplate(
+            '{literal}<tpl for=".">',
+            '<div style="font-size: 13px;">',
+                '<p>' + me.snippets.instock + '{instock}</p>',
+                '<p>' + me.snippets.preOrders + '{preorders}</p><p></p>',
+            '</div>',
+            '</tpl>{/literal}'
+        );
+
+        return me.articleInfoTemplate;
+    },
+
+    createLastOrdersContainer: function() {
+        var me = this;
+
+        return Ext.create('Ext.container.Container', {
+            name: 'lastOrdersContainer',
+            layout: 'hbox',
+            items: [
+                me.createLastOrderView(1),
+                me.createLastOrderView(2),
+                me.createLastOrderView(3)
+            ],
+            style: {
+                marginLeft: '50px'
+            }
+        });
+    },
+
+    createLastOrderView: function(viewNumber) {
+        var me = this;
+
+        return Ext.create('Ext.view.View', {
+            id: 'lastOrdersView' + viewNumber,
+            name: 'lastOrdersView' + viewNumber,
+            store: me.articleInfoStore,
+            width: 250,
+            tpl: me.createLastOrderTemplate(viewNumber)
+        });
+    },
+
+    createLastOrderTemplate: function(viewNumber) {
+        var me = this;
+
+        return new Ext.XTemplate(
+            '{literal}<tpl for=".">',
+            '<div style="font-size: 13px;">',
+                '<p>' + me.snippets.ordernumber + '{ordernumber' + viewNumber + '}</p>',
+                '<p>' + me.snippets.price + '{price' + viewNumber + '} ' + me.currencySymbol + '</p>',
+                '<p>' + me.snippets.quantity + '{quantity' + viewNumber + '}</p>',
+            '</div>',
+            '</tpl>{/literal}'
+        );
     },
 
     /**
@@ -250,6 +344,29 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         me.totalCostsStore.add(me.totalCostsModel);
 
         return me.totalCostsStore;
+    },
+
+    createArticleInfoStore: function() {
+        var me = this;
+
+        me.articleInfoModel = Ext.create('Shopware.apps.SwagBackendOrder.model.ArticleInfo');
+        
+        me.articleInfoModel.set('instock', 0);
+        me.articleInfoModel.set('preorders', 0);
+        me.articleInfoModel.set('ordernumber1', '');
+        me.articleInfoModel.set('ordernumber2', '');
+        me.articleInfoModel.set('ordernumber3', '');
+        me.articleInfoModel.set('price1', 0.00);
+        me.articleInfoModel.set('price2', '');
+        me.articleInfoModel.set('price3', 0.00);
+        me.articleInfoModel.set('quantity1', 0);
+        me.articleInfoModel.set('quantity2', 0);
+        me.articleInfoModel.set('quantity3', 0);
+
+        me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
+        me.articleInfoStore.add(me.articleInfoModel);
+
+        return me.articleInfoStore;
     },
 
     updateTotalCostsEvents: function() {
