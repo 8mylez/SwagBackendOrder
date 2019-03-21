@@ -11,6 +11,8 @@ namespace SwagBackendOrder;
 use Shopware\Bundle\PluginInstallerBundle\Service\InstallerService;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\InstallContext;
+use Shopware\Components\Plugin\Context\UninstallContext;
+use Shopware\Components\Plugin\Context\UpdateContext;
 use Shopware\Models\Plugin\Plugin as PluginModel;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -55,5 +57,51 @@ class SwagBackendOrder extends Plugin
 
         //Finally set the plugin config value to the core config value.
         $pluginManager->saveConfigElement($plugin, 'sendMail', $sendMailConfigGlobal);
+
+        $this->createAttributes();
+        $this->generateAttributeModels();
+
+        parent::install($context);
+    }
+
+    public function update(UpdateContext $context) {
+        $this->createAttributes();
+        $this->generateAttributeModels();
+
+    }
+
+    public function uninstall(UninstallContext $context) {
+        $this->removeAttributes();
+        $this->generateAttributeModels();
+
+        parent::uninstall($context);
+    }
+
+    private function createAttributes() {
+        $service = $this->container->get('shopware_attribute.crud_service');
+
+        $service->update('s_order_attributes', 'attribute1', 'string', [
+            'label' => 'Bestellnummer',
+            'displayInBackend' => true,
+            'custom' => false
+        ], null, false, '');        
+    }
+
+    private function removeAttributes() {
+        $service = $this->container->get('shopware_attribute.crud_service');
+
+        $service->update('s_order_attributes', 'attribute1', 'string', [
+            'label' => 'Freitext-Feld 1',
+            'displayInBackend' => true,
+            'custom' => true,
+        ], null, false, '');  
+    }
+
+    private function generateAttributeModels() {
+        $em = $this->container->get('models');
+
+        $metaDataCache = $em->getConfiguration()->getMetadataCacheImpl();
+        $metaDataCache->deleteAll();
+        $em->generateAttributeModels(['s_user_attributes', 's_core_auth_attributes', 's_order_attributes', 's_order_details_attributes']);
     }
 }
