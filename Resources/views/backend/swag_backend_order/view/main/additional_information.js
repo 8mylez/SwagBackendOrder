@@ -66,11 +66,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.AdditionalInformation', {
             }
         });
 
-        var attr2TxtBox = Ext.create('Ext.form.TextField', {
+        var attr2TxtBox = Ext.create('Ext.form.field.Date', {
             name: 'attr2TxtBox',
             width: 230,
             fieldLabel: me.snippets.additionalInformation.attribute2Label,
-            maxLengthText: 255,
             listeners: {
                 change: function (field, newValue, oldValue, eOpts) {
                     me.fireEvent('changeAttrField', field, newValue, oldValue);

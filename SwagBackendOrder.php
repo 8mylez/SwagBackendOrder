@@ -68,6 +68,7 @@ class SwagBackendOrder extends Plugin
         $this->createAttributes();
         $this->generateAttributeModels();
 
+        parent::update($context);
     }
 
     public function uninstall(UninstallContext $context) {
@@ -84,17 +85,29 @@ class SwagBackendOrder extends Plugin
             'label' => 'Bestellnummer',
             'displayInBackend' => true,
             'custom' => false
-        ], null, false, '');        
+        ]);
+
+        $service->update('s_order_attributes', 'attribute2', 'date', [
+            'label' => 'Lieferdatum',
+            'displayInBackend' => true,
+            'custom' => false
+        ]);  
     }
 
     private function removeAttributes() {
         $service = $this->container->get('shopware_attribute.crud_service');
 
         $service->update('s_order_attributes', 'attribute1', 'string', [
-            'label' => 'Freitext-Feld 1',
+            'label' => '',
             'displayInBackend' => true,
             'custom' => true,
-        ], null, false, '');  
+        ]);
+
+        $service->update('s_order_attributes', 'attribute2', 'string', [
+            'label' => '',
+            'displayInBackend' => true,
+            'custom' => true,
+        ]); 
     }
 
     private function generateAttributeModels() {
