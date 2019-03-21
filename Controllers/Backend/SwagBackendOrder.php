@@ -451,13 +451,14 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         /** @var RequestHydrator $requestHydrator */
         $requestHydrator = $this->get('swag_backend_order.price_calculation.request_hydrator');
         $requestStruct = $requestHydrator->hydrateFromRequest($this->Request()->getParams());
-
+        $emzPositions = json_decode($this->Request()->getParams()['positions']);
         $config = $this->container->get('config');
         $proportionalTaxCalculation = $config->get('proportionalTaxCalculation') && !$requestStruct->isTaxFree();
 
         //Basket position price calculation
         $positionPrices = [];
-        foreach ($requestStruct->getPositions() as $position) {
+        foreach ($requestStruct->getPositions() as $row => $position) {
+
             $positionPrice = $this->getPositionPrice($position, $requestStruct);
             $totalPositionPrice = new PriceResult();
             $totalPositionPrice->setNet($this->getTotalPrice($positionPrice->getNet(), $position->getQuantity()));
@@ -482,6 +483,8 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
 
                 $position->setTotal($this->getTotalPrice($position->getPrice(), $position->getQuantity()));
             }
+
+            $purchasePrices += ($this->emzGetArticlePurchaseprice($emzPositions[$row]->articleNumber) * $position->getQuantity());
         }
 
         $dispatchPrice = $this->getShippingPrice($requestStruct);
@@ -496,10 +499,25 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         $discountCalculator = $this->get('swag_backend_order.price_calculation.discount_calculator');
         $result = $discountCalculator->calculateDiscount($result);
 
+        $result['purchaseprice'] = floatval($purchasePrices);
+        $result['profit'] = floatval($result['sum'] - $purchasePrices);
+
         $this->view->assign([
             'data' => $result,
             'success' => true,
         ]);
+    }
+
+    private function emzGetArticlePurchaseprice($articleNumber)
+    {
+        $queryBuilder = $this->container->get('dbal_connection')->createQueryBuilder();
+        $queryBuilder->select(['purchaseprice'])
+            ->from('s_articles_details')
+            ->where('ordernumber = :ordernumber')
+            ->setParameter(':ordernumber', $articleNumber);
+
+        $result = $queryBuilder->execute()->fetchAll(\PDO::FETCH_COLUMN);
+        return $result[0];
     }
 
     /**
