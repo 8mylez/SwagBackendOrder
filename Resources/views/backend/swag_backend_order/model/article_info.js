@@ -22,8 +22,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.model.ArticleInfo', {
             name: 'price1',
             type: 'float',
             convert: function (v) {
-                var value = v;
-                if (value === '') {
+                var value = parseFloat(v);
+                if (value === '' || isNaN(value)) {
                     value = 0.0;
                 }
                 return value.toFixed(2);
@@ -32,8 +32,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.model.ArticleInfo', {
             name: 'price2',
             type: 'float',
             convert: function (v) {
-                var value = v;
-                if (value === '') {
+                var value = parseFloat(v);
+                if (value === '' || isNaN(value)) {
                     value = 0.0;
                 }
                 return value.toFixed(2);
@@ -42,8 +42,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.model.ArticleInfo', {
             name: 'price3',
             type: 'float',
             convert: function (v) {
-                var value = v;
-                if (value === '') {
+                var value = parseFloat(v);
+                if (value === '' || isNaN(value)) {
                     value = 0.0;
                 }
                 return value.toFixed(2);

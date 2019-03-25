@@ -159,6 +159,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             createBackendOrderStore: me.createBackendOrderStore
         }).show();
 
+        me.updateArticleInfo();
+
         me.callParent(arguments);
     },
 
@@ -515,47 +517,68 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 columns[6].setRawValue(displayValue);
                 columns[6].selectedIndex = recordNumber;
                 updateButton.setDisabled(false);
+
+                me.fillArticleInfo(result.number);
+                
             }
         });
+
+    },
+
+    fillArticleInfo: function(articleNumber) {
+        var me = this;
 
         me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
         me.articleInfoModel = me.articleInfoStore.getAt(0);
 
-        console.log('Editor Item', editor.editor.items.items[1]);
-
         Ext.Ajax.request({
             url: '{url action="getArticleInfo"}',
             params: {
-                articleNumber: editor.editor.items.items[1]
+                articleNumber: articleNumber
             },
             success: function(response) {
                 var responseObj = Ext.JSON.decode(response.responseText),
-                    result = responseObj.data;
+                    result = responseObj.data,
+                    instock = result.instock,
+                    preorders = result.preorders,
+                    orders = result.orders;
 
-                    console.log('Ajax Result', result);
+                me.articleInfoModel.beginEdit();
 
-                    // instock = result.instock,
-                    // preorders = result.preorders,
-                    // orders = result.orders;
+                me.articleInfoModel.set('instock', instock);
+                me.articleInfoModel.set('preorders', preorders);
 
-                // me.articleInfoModel.beginEdit();
+                if(orders[0]) {
+                    me.articleInfoModel.set('ordernumber1', orders[0].ordernumber);
+                    me.articleInfoModel.set('price1', orders[0].price);
+                    me.articleInfoModel.set('quantity1', orders[0].quantity);
+                } else {
+                    me.articleInfoModel.set('ordernumber1', '');
+                    me.articleInfoModel.set('price1',0);
+                    me.articleInfoModel.set('quantity1', 0);
+                }
 
-                // me.articleInfoModel.setValue('instock', instock);
-                // me.articleInfoModel.setValue('preorders', preorders);
+                if(orders[1]) {
+                    me.articleInfoModel.set('ordernumber2', orders[1].ordernumber);
+                    me.articleInfoModel.set('price2', orders[1].price);
+                    me.articleInfoModel.set('quantity2', orders[1].quantity);
+                } else {
+                    me.articleInfoModel.set('ordernumber2', '');
+                    me.articleInfoModel.set('price2', 0);
+                    me.articleInfoModel.set('quantity2', 0);
+                }
+
+                if(orders[2]) {
+                    me.articleInfoModel.set('ordernumber3', orders[2].ordernumber);
+                    me.articleInfoModel.set('price3', orders[2].price);
+                    me.articleInfoModel.set('quantity3', orders[2].quantity);
+                } else {
+                    me.articleInfoModel.set('ordernumber3', '');
+                    me.articleInfoModel.set('price3', 0);
+                    me.articleInfoModel.set('quantity3', 0);
+                }
                 
-                // me.articleInfoModel.setValue('ordernumber1', orders[1].ordernumber);
-                // me.articleInfoModel.setValue('ordernumber2', orders[2].ordernumber);
-                // me.articleInfoModel.setValue('ordernumber3', orders[3].ordernumber);
-
-                // me.articleInfoModel.setValue('price1', orders[1].price);
-                // me.articleInfoModel.setValue('price2', orders[2].price);
-                // me.articleInfoModel.setValue('price3', orders[3].price);
-
-                // me.articleInfoModel.setValue('quantity1', orders[1].quantity);
-                // me.articleInfoModel.setValue('quantity2', orders[2].quantity);
-                // me.articleInfoModel.setValue('quantity3', orders[3].quantity);
-
-                // me.articleInfoModel.endEdit();
+                me.articleInfoModel.endEdit();
             }
         });
     },
@@ -568,7 +591,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
      * @param eOpts
      */
     onCancelEdit: function (grid, eOpts) {
-        var record = eOpts.record,
+        var me = this, 
+            record = eOpts.record,
             store = eOpts.store;
 
         if (!(record instanceof Ext.data.Model) || !(store instanceof Ext.data.Store)) {
@@ -577,6 +601,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         if (record.get('articleId') === 0 && record.get('articleNumber') === '') {
             store.remove(record);
         }
+
+        me.updateArticleInfo();
     },
 
     /**
@@ -723,6 +749,34 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
         price = price * me.currencyStore.getAt(index).get('factor');
         return price;
+    },
+
+    updateArticleInfo: function() {
+        var me = this;
+
+        me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
+        me.articleInfoModel = me.articleInfoStore.getAt(0);
+
+        me.articleInfoModel.beginEdit();
+        
+        me.articleInfoModel.set('instock', '');
+        me.articleInfoModel.set('preorders', '');
+        
+        me.articleInfoModel.set('ordernumber1', '');
+        me.articleInfoModel.set('ordernumber2', '');
+        me.articleInfoModel.set('ordernumber3', '');
+
+        me.articleInfoModel.set('price1', 0);
+        me.articleInfoModel.set('price2', 0);
+        me.articleInfoModel.set('price3', 0);
+
+        me.articleInfoModel.set('quantity1', 0);
+        me.articleInfoModel.set('quantity2', 0);
+        me.articleInfoModel.set('quantity3', 0);
+
+        me.articleInfoModel.endEdit();
+
+        me.selectedArticleNumber = null;
     },
 
     /**
@@ -893,6 +947,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 me.window.setLoading(false);
             }
         });
+
+        me.updateArticleInfo();
     },
 
     /**

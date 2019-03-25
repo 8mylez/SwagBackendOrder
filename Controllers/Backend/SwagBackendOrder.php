@@ -48,15 +48,67 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
 {
     
     public function getArticleInfoAction() {
-        $ordernumber = $this->request->getParam('articleNumber');
+        $articleNumber = $this->request->getParam('articleNumber');
+
+        $preorders = $this->getPreorderCount($articleNumber);
+        $instock = $this->getInstock($articleNumber);
+        $orders = $this->getLastThreeOrders($articleNumber);
 
         $this->view->assign([
             'success' => true,
             'total' => 1,
             'data' => [
-                'number' => $ordernumber
+                'preorders' => $preorders,
+                'instock' => $instock,
+                'orders' => $orders
             ]
         ]);
+    }
+
+    private function getPreorderCount($articleNumber) {
+        $builder = $this->container->get('dbal_connection')->createQueryBuilder();
+
+        $builder->select('pickware_erp_warehouse_article_detail_stock_counts.stock, s_articles_details.instock')
+        ->from('s_articles_details')
+        ->rightJoin('s_articles_details', 'pickware_erp_warehouse_article_detail_stock_counts', null, 's_articles_details.id = pickware_erp_warehouse_article_detail_stock_counts.articleDetailId')
+        ->where('s_articles_details.ordernumber = ?')
+        ->setParameter(0, $articleNumber);
+
+        $result = $builder->execute()->fetchAll();
+
+        $instock = $result[0]["instock"];
+        $stock = 0;
+
+        foreach($result as $r) {
+            $stock += $r["stock"];
+        }
+
+        return $stock - $instock;
+    }
+
+    private function getInstock($articleNumber) {
+        $builder = $this->container->get('dbal_connection')->createQueryBuilder();
+
+        $builder->select('s_articles_details.instock')
+        ->from('s_articles_details')
+        ->where('s_articles_details.ordernumber = :number')
+        ->setParameter('number', $articleNumber);
+
+        return $builder->execute()->fetchAll()[0]['instock'];
+    }
+
+    private function getLastThreeOrders($articleNumber) {
+        $builder = $this->container->get('dbal_connection')->createQueryBuilder();
+
+        $builder->select('orderdetail.price', 'orderdetail.quantity', 's_order.ordernumber')
+        ->from('s_order_details', 'orderdetail')
+        ->leftJoin('orderdetail', 's_order', null, 'orderdetail.ordernumber = s_order.ordernumber')
+        ->where('orderdetail.articleordernumber = ?')
+        ->orderBy('s_order.ordertime', 'DESC')
+        ->setMaxResults(3)
+        ->setParameter(0, $articleNumber);
+
+        return $builder->execute()->fetchAll();
     }
     
     /**

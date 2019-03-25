@@ -59,6 +59,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         ];
 
         me.updateTotalCostsEvents();
+        me.updateArticleInfoEvents();
 
         me.displayNetCheckbox.on('change', function(checkbox, newValue, oldValue) {
             me.taxFreeCheckbox.setDisabled(!!newValue);
@@ -92,9 +93,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
 
         me.createTotalCostsStore();
         me.createArticleInfoStore();
-
+        
         me.totalCostsLabelsView = me.createTotalCostsLabelsView();
+        me.articleInfoView = me.createArticleInfoView();
 
+        me.lastOrderView1 = me.createLastOrderView(1);
+        me.lastOrderView2 = me.createLastOrderView(2);
+        me.lastOrderView3 = me.createLastOrderView(3);
+        
         me.totalCostsView = me.createTotalCostsView();
 
         me.totalCostsFloatContainer = me.createTotalCostsFloatContainer();
@@ -132,7 +138,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
                 marginLeft: '50px',
             },
             items: [
-                me.createArticleInfoView()
+                me.articleInfoView
             ]
         });
     },
@@ -172,9 +178,9 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
             name: 'lastOrdersContainer',
             layout: 'hbox',
             items: [
-                me.createLastOrderView(1),
-                me.createLastOrderView(2),
-                me.createLastOrderView(3)
+                me.lastOrderView1,
+                me.lastOrderView2,
+                me.lastOrderView3
             ],
             style: {
                 marginLeft: '50px'
@@ -206,6 +212,20 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
             '</div>',
             '</tpl>{/literal}'
         );
+    },
+
+    updateArticleInfo: function() {
+        var me = this;
+
+        me.articleInfoView.bindStore(me.articleInfoStore);
+        me.lastOrderView1.bindStore(me.articleInfoStore);
+        me.lastOrderView2.bindStore(me.articleInfoStore);
+        me.lastOrderView3.bindStore(me.articleInfoStore);
+
+        me.articleInfoView.tpl = me.createArticleInfoTemplate();
+        me.lastOrderView1.tpl = me.createLastOrderTemplate(1);
+        me.lastOrderView2.tpl = me.createLastOrderTemplate(2);
+        me.lastOrderView3.tpl = me.createLastOrderTemplate(3);
     },
 
     /**
@@ -385,6 +405,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
 
         me.currencyStore.on('load', function() {
             me.updateCurrency();
+            me.updateArticleInfo();
         });
 
         me.currencyStore.on('update', function() {
@@ -396,6 +417,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         });
     },
 
+    updateArticleInfoEvents: function() {
+        var me = this;
+
+        me.articleInfoStore.on('update', function() {
+            me.updateArticleInfo();
+        })
+    },
+
     updateTotalCosts: function() {
         var me = this;
 
@@ -404,6 +433,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         me.totalCostsLabelsView.bindStore(me.totalCostsStore);
         me.add(me.totalCostsContainer);
         me.doLayout();
+
     },
 
     updateCurrency: function() {
