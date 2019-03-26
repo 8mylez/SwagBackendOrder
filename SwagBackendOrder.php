@@ -72,8 +72,8 @@ class SwagBackendOrder extends Plugin
     }
 
     public function uninstall(UninstallContext $context) {
-        $this->removeAttributes();
-        $this->generateAttributeModels();
+        // $this->removeAttributes();
+        // $this->generateAttributeModels();
 
         parent::uninstall($context);
     }
@@ -87,7 +87,7 @@ class SwagBackendOrder extends Plugin
             'custom' => false
         ]);
 
-        $service->update('s_order_attributes', 'attribute2', 'date', [
+        $service->update('s_order_attributes', 'attribute2', 'string', [
             'label' => 'Lieferdatum',
             'displayInBackend' => true,
             'custom' => false
@@ -97,17 +97,22 @@ class SwagBackendOrder extends Plugin
     private function removeAttributes() {
         $service = $this->container->get('shopware_attribute.crud_service');
 
-        $service->update('s_order_attributes', 'attribute1', 'string', [
-            'label' => '',
-            'displayInBackend' => true,
-            'custom' => true,
-        ]);
+        // $service->update('s_order_attributes', 'attribute1', 'string', [
+        //     'label' => '',
+        //     'displayInBackend' => true,
+        //     'custom' => true,
+        // ]);
 
-        $service->update('s_order_attributes', 'attribute2', 'string', [
-            'label' => '',
-            'displayInBackend' => true,
-            'custom' => true,
-        ]); 
+        // $service->update('s_order_attributes', 'attribute2', 'string', [
+        //     'label' => '',
+        //     'displayInBackend' => true,
+        //     'custom' => true
+        // ]); 
+
+        /**
+         * removing this attributes back to default, deletes the labels after clicking 'reinstall' in backend
+         * labels have to be removed by hand
+         */
     }
 
     private function generateAttributeModels() {
