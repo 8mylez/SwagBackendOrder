@@ -49,10 +49,11 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
     
     public function getArticleInfoAction() {
         $articleNumber = $this->request->getParam('articleNumber');
+        $userID = $this->request->getParam('customerID');
 
         $preorders = $this->getPreorderCount($articleNumber);
         $instock = $this->getInstock($articleNumber);
-        $orders = $this->getLastThreeOrders($articleNumber);
+        $orders = $this->getLastThreeOrders($articleNumber, $userID);
 
         $this->view->assign([
             'success' => true,
@@ -97,16 +98,18 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         return $builder->execute()->fetchAll()[0]['instock'];
     }
 
-    private function getLastThreeOrders($articleNumber) {
+    private function getLastThreeOrders($articleNumber, $userID) {
         $builder = $this->container->get('dbal_connection')->createQueryBuilder();
 
         $builder->select('orderdetail.price', 'orderdetail.quantity', 's_order.ordernumber')
         ->from('s_order_details', 'orderdetail')
         ->leftJoin('orderdetail', 's_order', null, 'orderdetail.ordernumber = s_order.ordernumber')
         ->where('orderdetail.articleordernumber = ?')
+        ->andWhere('s_order.userID = ?')
         ->orderBy('s_order.ordertime', 'DESC')
         ->setMaxResults(3)
-        ->setParameter(0, $articleNumber);
+        ->setParameter(0, $articleNumber)
+        ->setParameter(1, $userID);
 
         return $builder->execute()->fetchAll();
     }

@@ -528,13 +528,18 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
     fillArticleInfo: function(articleNumber) {
         var me = this;
 
+        if(!me.subApplication.getStore('Customer').getAt(0)) {
+            return;
+        }
+
         me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
         me.articleInfoModel = me.articleInfoStore.getAt(0);
 
         Ext.Ajax.request({
             url: '{url action="getArticleInfo"}',
             params: {
-                articleNumber: articleNumber
+                articleNumber: articleNumber,
+                customerID: me.subApplication.getStore('Customer').getAt(0).get('id')
             },
             success: function(response) {
                 var responseObj = Ext.JSON.decode(response.responseText),
