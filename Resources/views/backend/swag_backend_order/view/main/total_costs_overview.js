@@ -94,8 +94,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         me.createTotalCostsStore();
         me.createArticleInfoStore();
         
+        me.createOverviewPriceStore();
+
         me.totalCostsLabelsView = me.createTotalCostsLabelsView();
         me.articleInfoView = me.createArticleInfoView();
+        me.overviewPriceView = me.createOverviewPriceView();
 
         me.lastOrderView1 = me.createLastOrderView(1);
         me.lastOrderView2 = me.createLastOrderView(2);
@@ -246,6 +249,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
             overflowY: 'auto',
             flex: 1,
             items: [
+                me.overviewPriceView,
                 me.totalCostsLabelsView,
                 me.totalCostsView
             ]
@@ -265,6 +269,45 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
             width: 85,
             tpl: me.createTotalCostsTemplate()
         });
+    },
+
+    /**
+     * @return { Ext.view.View }
+     */
+    createOverviewPriceView: function() {
+        var me = this;
+
+        return Ext.create('Ext.view.View', {
+            id: 'overviewPriceView',
+            name: 'overviewPriceView',
+            store: me.totalCostsStore,
+            height: 100,
+            tpl: this.createOverviewPriceTemplate()
+        });
+    },
+
+    /**
+     * @returns { Ext.XTemplate }
+     */
+    createOverviewPriceTemplate: function() {
+        var me = this;
+
+        me.overviewTempalte = new Ext.XTemplate(
+            '{literal}<tpl for=".">',
+            '<div style="padding-left: 10px; font-size: 13px; text-align: right; margin-right: 10px;">',
+                '<p><b>Gewinn: {profit} ' + me.currencySymbol + '</b></p>',
+                '<p>Einkaufspreis: {purchaseprice} ' + me.currencySymbol + '</p>',
+            '</div>',
+            '</tpl>{/literal}',
+            {
+
+                formatNumber: function(value) {
+                    return value.toFixed(2);
+                }
+            }
+        );
+
+        return me.overviewTempalte;
     },
 
     /**
@@ -366,6 +409,22 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         return me.totalCostsStore;
     },
 
+    /**
+     * @returns { Shopware.apps.SwagBackendOrder.store.OverviewPrice }
+     */
+    createOverviewPriceStore: function() {
+        var me = this;
+
+        me.overviewPriceModel = Ext.create('Shopware.apps.SwagBackendOrder.model.OverviewPrice', {});
+        me.overviewPriceModel.set('purchaseprice', 0);
+        me.overviewPriceModel.set('profit', 0);
+
+        me.overviewPriceStore = me.subApplication.getStore('OverviewPrice');
+        me.overviewPriceStore.add(me.overviewPriceModel);
+
+        return me.overviewPriceStore;
+    },
+
     createArticleInfoStore: function() {
         var me = this;
 
@@ -431,6 +490,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         me.remove('totalCostsContainer', true);
         me.totalCostsView.bindStore(me.totalCostsStore);
         me.totalCostsLabelsView.bindStore(me.totalCostsStore);
+        me.overviewPriceView.bindStore(me.overviewPriceStore);
         me.add(me.totalCostsContainer);
         me.doLayout();
 
@@ -446,6 +506,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         if (typeof currencyModel !== "undefined") {
             me.currencySymbol = currencyModel.get('symbol');
             me.totalCostsView.tpl = me.createTotalCostsTemplate();
+            me.overviewPriceView.tpl = me.createOverviewPriceTemplate();
             me.updateTotalCosts();
         }
     },
@@ -497,6 +558,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
             ]
         });
     },
+
 
     /**
      * @returns { Ext.form.field.Checkbox }

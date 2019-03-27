@@ -869,12 +869,15 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.totalCostsStore = me.subApplication.getStore('TotalCosts');
         me.totalCostsModel = me.totalCostsStore.getAt(0);
 
+        me.overviewPriceStore = me.subApplication.getStore('OverviewPrice');
+        me.overviewPriceModel = me.overviewPriceStore.getAt(0);
+
         var positionArray = [];
         me.positionStore.each(function (record) {
             positionArray.push(record.data);
         });
         var positionJsonString = Ext.JSON.encode(positionArray);
-
+        
         Ext.Ajax.request({
             url: '{url action="calculateBasket"}',
             params: {
@@ -937,6 +940,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.totalCostsModel.set('proportionalTaxCalculation', record.proportionalTaxCalculation);
                 } finally {
                     me.totalCostsModel.endEdit();
+                }
+
+                me.overviewPriceModel.beginEdit();
+                try{
+                    me.overviewPriceModel.set('profit', record.profit);
+                    me.overviewPriceModel.set('purchaseprice', record.purchaseprice);
+                } finally{
+                    me.overviewPriceModel.endEdit();
                 }
 
                 // Don't allow any discount if there are no positions.
