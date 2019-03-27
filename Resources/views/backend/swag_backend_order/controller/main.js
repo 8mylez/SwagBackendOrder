@@ -159,6 +159,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             createBackendOrderStore: me.createBackendOrderStore
         }).show();
 
+        me.updateArticleInfo();
+
         me.callParent(arguments);
     },
 
@@ -515,6 +517,73 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 columns[6].setRawValue(displayValue);
                 columns[6].selectedIndex = recordNumber;
                 updateButton.setDisabled(false);
+
+                me.fillArticleInfo(result.number);
+                
+            }
+        });
+
+    },
+
+    fillArticleInfo: function(articleNumber) {
+        var me = this;
+
+        if(!me.subApplication.getStore('Customer').getAt(0)) {
+            return;
+        }
+
+        me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
+        me.articleInfoModel = me.articleInfoStore.getAt(0);
+
+        Ext.Ajax.request({
+            url: '{url action="getArticleInfo"}',
+            params: {
+                articleNumber: articleNumber,
+                customerID: me.subApplication.getStore('Customer').getAt(0).get('id')
+            },
+            success: function(response) {
+                var responseObj = Ext.JSON.decode(response.responseText),
+                    result = responseObj.data,
+                    instock = result.instock,
+                    preorders = result.preorders,
+                    orders = result.orders;
+
+                me.articleInfoModel.beginEdit();
+
+                me.articleInfoModel.set('instock', instock);
+                me.articleInfoModel.set('preorders', preorders);
+
+                if(orders[0]) {
+                    me.articleInfoModel.set('ordernumber1', orders[0].ordernumber);
+                    me.articleInfoModel.set('price1', orders[0].price);
+                    me.articleInfoModel.set('quantity1', orders[0].quantity);
+                } else {
+                    me.articleInfoModel.set('ordernumber1', '');
+                    me.articleInfoModel.set('price1',0);
+                    me.articleInfoModel.set('quantity1', 0);
+                }
+
+                if(orders[1]) {
+                    me.articleInfoModel.set('ordernumber2', orders[1].ordernumber);
+                    me.articleInfoModel.set('price2', orders[1].price);
+                    me.articleInfoModel.set('quantity2', orders[1].quantity);
+                } else {
+                    me.articleInfoModel.set('ordernumber2', '');
+                    me.articleInfoModel.set('price2', 0);
+                    me.articleInfoModel.set('quantity2', 0);
+                }
+
+                if(orders[2]) {
+                    me.articleInfoModel.set('ordernumber3', orders[2].ordernumber);
+                    me.articleInfoModel.set('price3', orders[2].price);
+                    me.articleInfoModel.set('quantity3', orders[2].quantity);
+                } else {
+                    me.articleInfoModel.set('ordernumber3', '');
+                    me.articleInfoModel.set('price3', 0);
+                    me.articleInfoModel.set('quantity3', 0);
+                }
+                
+                me.articleInfoModel.endEdit();
             }
         });
     },
@@ -527,7 +596,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
      * @param eOpts
      */
     onCancelEdit: function (grid, eOpts) {
-        var record = eOpts.record,
+        var me = this, 
+            record = eOpts.record,
             store = eOpts.store;
 
         if (!(record instanceof Ext.data.Model) || !(store instanceof Ext.data.Store)) {
@@ -536,6 +606,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         if (record.get('articleId') === 0 && record.get('articleNumber') === '') {
             store.remove(record);
         }
+
+        me.updateArticleInfo();
     },
 
     /**
@@ -684,6 +756,34 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         return price;
     },
 
+    updateArticleInfo: function() {
+        var me = this;
+
+        me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
+        me.articleInfoModel = me.articleInfoStore.getAt(0);
+
+        me.articleInfoModel.beginEdit();
+        
+        me.articleInfoModel.set('instock', '');
+        me.articleInfoModel.set('preorders', '');
+        
+        me.articleInfoModel.set('ordernumber1', '');
+        me.articleInfoModel.set('ordernumber2', '');
+        me.articleInfoModel.set('ordernumber3', '');
+
+        me.articleInfoModel.set('price1', 0);
+        me.articleInfoModel.set('price2', 0);
+        me.articleInfoModel.set('price3', 0);
+
+        me.articleInfoModel.set('quantity1', 0);
+        me.articleInfoModel.set('quantity2', 0);
+        me.articleInfoModel.set('quantity3', 0);
+
+        me.articleInfoModel.endEdit();
+
+        me.selectedArticleNumber = null;
+    },
+
     /**
      * saves the attribute fields in the correct store field
      *
@@ -769,12 +869,15 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.totalCostsStore = me.subApplication.getStore('TotalCosts');
         me.totalCostsModel = me.totalCostsStore.getAt(0);
 
+        me.overviewPriceStore = me.subApplication.getStore('OverviewPrice');
+        me.overviewPriceModel = me.overviewPriceStore.getAt(0);
+
         var positionArray = [];
         me.positionStore.each(function (record) {
             positionArray.push(record.data);
         });
         var positionJsonString = Ext.JSON.encode(positionArray);
-
+        
         Ext.Ajax.request({
             url: '{url action="calculateBasket"}',
             params: {
@@ -839,6 +942,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.totalCostsModel.endEdit();
                 }
 
+                me.overviewPriceModel.beginEdit();
+                try{
+                    me.overviewPriceModel.set('profit', record.profit);
+                    me.overviewPriceModel.set('purchaseprice', record.purchaseprice);
+                } finally{
+                    me.overviewPriceModel.endEdit();
+                }
+
                 // Don't allow any discount if there are no positions.
                 addDiscountButton.setDisabled(me.positionStore.getCount() <= 0 || discountRecord !== null);
 
@@ -852,6 +963,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 me.window.setLoading(false);
             }
         });
+
+        me.updateArticleInfo();
     },
 
     /**

@@ -57,12 +57,20 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.list.Grid', {
             autoCancel: true,
             listeners: {
                 beforeEdit: function (editor, event) {
-                    var record = event.record;
+                    var record = event.record,
+                        mainController = me.subApplication.getController('Main'),
+                        number = editor.editor.items.items[1].getValue();
+
+                        if(number) {
+                            mainController.fillArticleInfo(number);
+                        }
 
                     // Discounts do not support inline editing!
                     if (record.get('isDiscount') === true) {
                         return false;
                     }
+
+                    
                 }
             }
         });
