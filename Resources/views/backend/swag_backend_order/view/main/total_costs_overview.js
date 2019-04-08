@@ -294,9 +294,13 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
 
         me.overviewTempalte = new Ext.XTemplate(
             '{literal}<tpl for=".">',
-            '<div style="padding-left: 10px; font-size: 13px; text-align: right; margin-right: 10px;">',
+            '<div style="padding-left: 10px; font-size: 13px; text-align: right; margin-right: 10px; margin-bottom: 15px;">',
                 '<p><b>Gewinn: {profit} ' + me.currencySymbol + '</b></p>',
-                '<p>Einkaufspreis: {purchaseprice} ' + me.currencySymbol + '</p>',
+                '<p>EK: {purchaseprice} ' + me.currencySymbol + '</p>',
+            '</div>',
+            '<div style="padding-left: 10px; font-size: 13px; text-align: right; margin-right: 10px;">',
+                '<p><b>Gewinn Auswahl: {profitPerSelection} ' + me.currencySymbol + '</b></p>',
+                '<p>EK Auswahl: {purchasePricePerSelection} ' + me.currencySymbol + '</p>',
             '</div>',
             '</tpl>{/literal}',
             {
@@ -306,6 +310,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
                 }
             }
         );
+
+
 
         return me.overviewTempalte;
     },
@@ -418,6 +424,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         me.overviewPriceModel = Ext.create('Shopware.apps.SwagBackendOrder.model.OverviewPrice', {});
         me.overviewPriceModel.set('purchaseprice', 0);
         me.overviewPriceModel.set('profit', 0);
+        me.overviewPriceModel.set('purchasePricePerSelection', 0);
+        me.overviewPriceModel.set('profitPerSelection', 0);
 
         me.overviewPriceStore = me.subApplication.getStore('OverviewPrice');
         me.overviewPriceStore.add(me.overviewPriceModel);

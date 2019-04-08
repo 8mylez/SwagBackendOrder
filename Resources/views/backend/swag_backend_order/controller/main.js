@@ -518,8 +518,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 columns[6].selectedIndex = recordNumber;
                 updateButton.setDisabled(false);
 
-                me.fillArticleInfo(result.number);
-                
+                me.fillArticleInfo(result.number);                
             }
         });
 
@@ -584,6 +583,58 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
                 
                 me.articleInfoModel.endEdit();
+            }
+        });
+    },
+
+    calculateArticleProfit: function (products) {
+        var me = this;
+
+        let articleNumbers = [];
+        products.forEach(function(product) {
+            articleNumbers.push(
+                product.articleNumber
+            );
+        });
+
+        me.overviewPriceStore = me.subApplication.getStore('OverviewPrice');
+        me.overviewPriceModel = me.overviewPriceStore.getAt(0);
+
+        Ext.Ajax.request({
+            url: '{url action="getArticlePurchasePrice"}',
+            params: {
+                articleNumbers: Ext.JSON.encode(articleNumbers)
+            },
+            success: function(response) {
+                var responseObj = Ext.JSON.decode(response.responseText),
+                    result = responseObj.data;
+                   
+                let profitPerSelection = 0.00;
+                let purchasePricePerSelection = 0.00;
+                let selectionTotal = 0.00;
+
+                products.forEach(function(product) {
+                    selectionTotal += parseFloat(product.total);
+                });
+
+                result.purchasePriceResult.forEach(function(result) {
+                    let { quantity } = products.filter(product => product.articleNumber === result.ordernumber)[0];
+                    purchasePricePerSelection += parseFloat(quantity) * parseFloat(result.purchaseprice);
+                });
+
+                profitPerSelection = parseFloat(selectionTotal) - parseFloat(purchasePricePerSelection);
+
+                console.log('purchasePricePerSelection', purchasePricePerSelection);
+
+                me.overviewPriceModel.beginEdit();
+                me.overviewPriceModel.set('profitPerSelection', profitPerSelection);
+                me.overviewPriceModel.set('purchasePricePerSelection', purchasePricePerSelection);
+                me.overviewPriceModel.set('profit', profitPerSelection);
+                me.overviewPriceModel.set('purchaseprice', purchasePricePerSelection);
+                me.overviewPriceModel.endEdit();
+
+                me.overviewPriceModel.commit();                
+                me.getTotalCostsOverview().overviewPriceView.refresh();
             }
         });
     },
