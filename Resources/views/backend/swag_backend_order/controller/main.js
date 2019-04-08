@@ -697,6 +697,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 customerRecord = me.customerStore.getAt(0);
+
+                if(customerRecord && customerRecord.raw && customerRecord.raw.internalComment) {
+                    alert(customerRecord.raw.internalComment);
+                }
+
                 var title = me.snippets.title + ' ' +
                     customerRecord.get('firstname') +
                     ' ' +
@@ -717,6 +722,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 me.window.setTitle(title);
+
+                
             }
         });
     },
