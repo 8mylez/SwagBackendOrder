@@ -433,6 +433,20 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.list.Grid', {
                 // Unlocks the save button if the user has checked at least one checkbox
                 selectionchange: function (sm, selections) {
                     me.deletePositionsButton.setDisabled(selections.length === 0);
+
+                    var products = [];
+
+                    selections.forEach(function(selection) {
+                        products.push({
+                            articleNumber: selection.data.articleNumber,
+                            total: selection.data.total,
+                            quantity: selection.data.quantity,
+                        });
+                    });
+
+                    mainController = me.subApplication.getController('Main');
+                    
+                    mainController.calculateArticleProfit(products);
                 }
             }
         });

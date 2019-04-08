@@ -43,11 +43,12 @@ use SwagBackendOrder\Components\PriceCalculation\Struct\RequestStruct;
 use SwagBackendOrder\Components\PriceCalculation\TaxCalculation;
 use SwagBackendOrder\Components\Translation\PaymentTranslator;
 use SwagBackendOrder\Components\Translation\ShippingTranslator;
+use Doctrine\DBAL\Connection;
 
 class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers_Backend_ExtJs
 {
-    
-    public function getArticleInfoAction() {
+    public function getArticleInfoAction()
+    {
         $articleNumber = $this->request->getParam('articleNumber');
         $userID = $this->request->getParam('customerID');
 
@@ -66,7 +67,31 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         ]);
     }
 
-    private function getPreorderCount($articleNumber) {
+    public function getArticlePurchasePriceAction()
+    {
+        $articleNumbers = $this->request->getParam('articleNumbers');
+        $articleNumbers = json_decode($articleNumbers);
+
+        $builder = $this->container->get('dbal_connection')->createQueryBuilder();
+
+        $builder->select('s_articles_details.ordernumber, s_articles_details.purchaseprice')
+        ->from('s_articles_details')
+        ->where('s_articles_details.ordernumber IN (:numbers)')
+        ->setParameter('numbers', $articleNumbers, Connection::PARAM_STR_ARRAY);
+
+        $purchasePriceResult = $builder->execute()->fetchAll();
+
+        $this->view->assign([
+            'success' => true,
+            'total' => 1,
+            'data' => [
+                'purchasePriceResult' => $purchasePriceResult,
+            ]
+        ]);
+    }
+
+    private function getPreorderCount($articleNumber)
+    {
         $builder = $this->container->get('dbal_connection')->createQueryBuilder();
 
         $builder->select('pickware_erp_warehouse_article_detail_stock_counts.stock, s_articles_details.instock')
@@ -80,14 +105,15 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         $instock = $result[0]["instock"];
         $stock = 0;
 
-        foreach($result as $r) {
+        foreach ($result as $r) {
             $stock += $r["stock"];
         }
 
         return $stock - $instock;
     }
 
-    private function getInstock($articleNumber) {
+    private function getInstock($articleNumber)
+    {
         $builder = $this->container->get('dbal_connection')->createQueryBuilder();
 
         $builder->select('s_articles_details.instock')
@@ -98,7 +124,8 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         return $builder->execute()->fetchAll()[0]['instock'];
     }
 
-    private function getLastThreeOrders($articleNumber, $userID) {
+    private function getLastThreeOrders($articleNumber, $userID)
+    {
         $builder = $this->container->get('dbal_connection')->createQueryBuilder();
 
         $builder->select('orderdetail.price', 'orderdetail.quantity', 's_order.ordernumber')
@@ -526,7 +553,6 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         //Basket position price calculation
         $positionPrices = [];
         foreach ($requestStruct->getPositions() as $row => $position) {
-
             $positionPrice = $this->getPositionPrice($position, $requestStruct);
             $totalPositionPrice = new PriceResult();
             $totalPositionPrice->setNet($this->getTotalPrice($positionPrice->getNet(), $position->getQuantity()));
