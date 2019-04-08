@@ -518,7 +518,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 columns[6].selectedIndex = recordNumber;
                 updateButton.setDisabled(false);
 
-                me.fillArticleInfo(result.number);                
+                me.fillArticleInfo(result.number);
             }
         });
 
@@ -600,6 +600,16 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.overviewPriceStore = me.subApplication.getStore('OverviewPrice');
         me.overviewPriceModel = me.overviewPriceStore.getAt(0);
 
+        if(products.length <= 0) {
+            me.overviewPriceModel.beginEdit();
+            me.overviewPriceModel.set('profitPerSelection', 0);
+            me.overviewPriceModel.set('purchasePricePerSelection', 0);
+            me.overviewPriceModel.endEdit();
+
+            me.getTotalCostsOverview().overviewPriceView.refresh();
+            return false;
+        }
+
         Ext.Ajax.request({
             url: '{url action="getArticlePurchasePrice"}',
             params: {
@@ -624,16 +634,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                 profitPerSelection = parseFloat(selectionTotal) - parseFloat(purchasePricePerSelection);
 
-                console.log('purchasePricePerSelection', purchasePricePerSelection);
-
                 me.overviewPriceModel.beginEdit();
                 me.overviewPriceModel.set('profitPerSelection', profitPerSelection);
                 me.overviewPriceModel.set('purchasePricePerSelection', purchasePricePerSelection);
-                me.overviewPriceModel.set('profit', profitPerSelection);
-                me.overviewPriceModel.set('purchaseprice', purchasePricePerSelection);
                 me.overviewPriceModel.endEdit();
 
-                me.overviewPriceModel.commit();                
                 me.getTotalCostsOverview().overviewPriceView.refresh();
             }
         });
@@ -1016,6 +1021,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         });
 
         me.updateArticleInfo();
+
+        let lastPosition = positionArray.pop();
+        if(lastPosition) {
+            me.calculateArticleProfit([lastPosition]);
+        }
     },
 
     /**
