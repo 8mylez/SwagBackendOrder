@@ -45,6 +45,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Billing
                 me.billingStore = me.customerStore.getAt(0).billing();
                 me.billingAddressComboBox.bindStore(me.billingStore);
 
+                console.log('me.billingStore', me.billingStore);
+
                 me.resetFields();
             }
         });

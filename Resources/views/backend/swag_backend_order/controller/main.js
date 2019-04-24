@@ -13,6 +13,12 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         },
         {
             ref: 'positionGrid', selector: 'createbackendorder-position-grid'
+        },
+        {
+            ref: 'paymentView', selector: 'createbackendorder-customer-payment'
+        },
+        {
+            ref: 'billingView', selector: 'createbackendorder-customer-billing'
         }
     ],
 
@@ -714,6 +720,15 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 if (customerRecord.get('company')) {
                     title += ' - ' + customerRecord.get('company');
                 }
+
+                me.orderModel.set('paymentId', customerRecord.raw.paymentId);
+                me.orderModel.set('billingAddressId', customerRecord.raw.billing[0].id);
+
+                console.log('me.getBillingView()', me.getBillingView());
+                console.log('customerRecord.raw.billing', customerRecord.raw.billing);
+
+                me.getPaymentView().paymentComboBox.setValue(customerRecord.raw.paymentId);
+                me.getBillingView().billingAddressComboBox.setValue('Emz Goltfisch');
 
                 if (!customerRecord.customerGroup().getAt(0).get('tax')) {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(true);
