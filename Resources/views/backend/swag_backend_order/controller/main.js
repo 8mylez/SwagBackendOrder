@@ -13,6 +13,15 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         },
         {
             ref: 'positionGrid', selector: 'createbackendorder-position-grid'
+        },
+        {
+            ref: 'paymentView', selector: 'createbackendorder-customer-payment'
+        },
+        {
+            ref: 'billingView', selector: 'createbackendorder-customer-billing'
+        },
+        {
+            ref: 'shippingCostsView', selector: 'createbackendorder-shippingcosts'
         }
     ],
 
@@ -715,6 +724,22 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     title += ' - ' + customerRecord.get('company');
                 }
 
+                me.orderModel.set('paymentId', customerRecord.raw.paymentId);
+
+                me.getPaymentView().paymentComboBox.setValue(customerRecord.raw.paymentId);
+
+                var billingId = customerRecord.raw.billing[0].id;
+                var billingRecord = me.getBillingView().billingAddressComboBox.store.getById(billingId);
+                var billingCombo = me.getBillingView().billingAddressComboBox;
+                
+                billingCombo.select(billingRecord.data.displayField);
+                billingCombo.fireEvent('select', billingCombo, [billingRecord]);
+
+                var firstShippingCost = me.getShippingCostsView().shippingArt.store.first();
+                var shippingCostCombo = me.getShippingCostsView().shippingArt;
+                shippingCostCombo.select(firstShippingCost.data.id);
+                shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
+
                 if (!customerRecord.customerGroup().getAt(0).get('tax')) {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(true);
                 } else {
@@ -722,8 +747,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 me.window.setTitle(title);
-
-                
             }
         });
     },

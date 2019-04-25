@@ -76,9 +76,9 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
      */
     createShippingCostsContainerLeft: function () {
         var me = this,
-            shippingArt, shippingCosts, shippingCostsNet, shippingFieldsArray;
+            shippingCosts, shippingCostsNet, shippingFieldsArray;
 
-        shippingArt = Ext.create('Ext.form.field.ComboBox', {
+        me.shippingArt = Ext.create('Ext.form.field.ComboBox', {
             name: 'shipping',
             width: 250,
             queryMode: 'local',
@@ -88,7 +88,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
             allowBlank: false,
             fieldLabel: me.snippets.fields.art,
             listeners: {
-                select: function (combo, records, eOpts) {
+                select: function (combo, records) {
                     if (!me.isAllowedDispatchType(records[0].data.type)) {
                         Shopware.Notification.createGrowlMessage(me.snippets.error.title, me.snippets.error.text);
                         me.dispatchId = null;
@@ -122,7 +122,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
             padding: '10 0 0 10',
             autoHeight: true,
             items: [
-                shippingArt
+                me.shippingArt
             ]
         });
     },
