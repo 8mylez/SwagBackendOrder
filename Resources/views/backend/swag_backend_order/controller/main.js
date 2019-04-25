@@ -19,6 +19,9 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         },
         {
             ref: 'billingView', selector: 'createbackendorder-customer-billing'
+        },
+        {
+            ref: 'shippingCostsView', selector: 'createbackendorder-shippingcosts'
         }
     ],
 
@@ -722,13 +725,20 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 me.orderModel.set('paymentId', customerRecord.raw.paymentId);
-                me.orderModel.set('billingAddressId', customerRecord.raw.billing[0].id);
-
-                console.log('me.getBillingView()', me.getBillingView());
-                console.log('customerRecord.raw.billing', customerRecord.raw.billing);
 
                 me.getPaymentView().paymentComboBox.setValue(customerRecord.raw.paymentId);
-                me.getBillingView().billingAddressComboBox.setValue('Emz Goltfisch');
+
+                var billingId = customerRecord.raw.billing[0].id;
+                var billingRecord = me.getBillingView().billingAddressComboBox.store.getById(billingId);
+                var billingCombo = me.getBillingView().billingAddressComboBox;
+                
+                billingCombo.select(billingRecord.data.displayField);
+                billingCombo.fireEvent('select', billingCombo, [billingRecord]);
+
+                var firstShippingCost = me.getShippingCostsView().shippingArt.store.first();
+                var shippingCostCombo = me.getShippingCostsView().shippingArt;
+                shippingCostCombo.select(firstShippingCost.data.id);
+                shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
 
                 if (!customerRecord.customerGroup().getAt(0).get('tax')) {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(true);
@@ -737,8 +747,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 me.window.setTitle(title);
-
-                
             }
         });
     },
