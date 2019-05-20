@@ -150,14 +150,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.orderModel.set('currencyFactor', 1);
 
         me.currencyStore = me.subApplication.getStore('Currency').load();
-
-        // passed a user id
-        if (typeof me.subApplication.params !== 'undefined') {
-            if (me.subApplication.params.userId) {
-                me.onSelectCustomer(null, me.subApplication.params.userId);
-            }
-        }
-
         /**
          * initializes the window
          */
@@ -169,6 +161,13 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         }).show();
 
         me.updateArticleInfo();
+
+        // passed a user id
+        if (typeof me.subApplication.params !== 'undefined') {
+            if (me.subApplication.params.userId) {
+                me.onSelectCustomer(null, me.subApplication.params.userId);
+            }
+        }
 
         me.callParent(arguments);
     },
@@ -707,8 +706,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                 customerRecord = me.customerStore.getAt(0);
 
-                console.log('customerRecord', customerRecord);
-
                 if(customerRecord && customerRecord.raw && customerRecord.raw.internalComment) {
                     alert(customerRecord.raw.internalComment);
                 }
@@ -727,39 +724,19 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 me.orderModel.set('paymentId', customerRecord.raw.paymentId);
-
+    
                 me.getPaymentView().paymentComboBox.setValue(customerRecord.raw.paymentId);
 
                 var billingId = customerRecord.raw.billing[0].id;
                 var billingRecord = me.getBillingView().billingAddressComboBox.store.getById(billingId);
                 var billingCombo = me.getBillingView().billingAddressComboBox;
 
-                if(!billingRecord) {
-                    billingRecord = customerRecord.billingStore.getById(billingId);
-                    console.log('billingRecord', billingRecord);
-                }
-
-                // console.log('me.getBillingView()', me.getBillingView());
-                // console.log('me.getBillingView().billingAddressComboBox', me.getBillingView().billingAddressComboBox);
-                // console.log('me.getBillingView().billingAddressComboBox.store', me.getBillingView().billingAddressComboBox.store);
-                // console.log('me.getBillingView().billingAddressComboBox.store.getById(billingId);', me.getBillingView().billingAddressComboBox.store.getById(billingId));
-
-                // console.log('billingId', billingId);
-                // console.log('billingRecord', billingRecord);
-                // console.log('customerRecord.raw', customerRecord.raw);
-
                 billingCombo.select(billingRecord.data.displayField);
+
                 billingCombo.fireEvent('select', billingCombo, [billingRecord]);
 
                 var firstShippingCost = me.getShippingCostsView().shippingArt.store.first();
                 var shippingCostCombo = me.getShippingCostsView().shippingArt;
-
-                console.log('customerRecord', customerRecord);
-
-                if(!firstShippingCost) {
-                    firstShippingCost = customerRecord.shippingStore.first();
-                    console.log('firstShippingCost', firstShippingCost);
-                }
 
                 shippingCostCombo.select(firstShippingCost.data.id);
                 shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);

@@ -85,6 +85,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Billing
             },
             listeners: {
                 'select': function (comboBox, record) {
+                    
                     me.fireEvent('selectBillingAddress', record[0], me);
 
                     billingAddressTemplateStore = Ext.create('Ext.data.Store', {
