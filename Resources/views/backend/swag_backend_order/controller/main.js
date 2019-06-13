@@ -525,15 +525,21 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 columns[6].setRawValue(displayValue);
                 columns[6].selectedIndex = recordNumber;
                 updateButton.setDisabled(false);
-
-                me.fillArticleInfo(result.number);
             }
         });
 
     },
 
-    fillArticleInfo: function(articleNumber) {
+    fillArticleInfo: function(products) {
         var me = this;
+
+        let articleNumbers = [];
+
+        products.forEach(function(product) {
+            articleNumbers.push(
+                product.articleNumber
+            );
+        });
 
         if(!me.subApplication.getStore('Customer').getAt(0)) {
             return;
@@ -542,18 +548,37 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
         me.articleInfoModel = me.articleInfoStore.getAt(0);
 
+        if(products.length <= 0) {
+            me.updateArticleInfo();
+            
+            return false;
+        }
+
         Ext.Ajax.request({
             url: '{url action="getArticleInfo"}',
             params: {
-                articleNumber: articleNumber,
+                articleNumbers: Ext.JSON.encode(articleNumbers),
                 customerID: me.subApplication.getStore('Customer').getAt(0).get('id')
             },
             success: function(response) {
                 var responseObj = Ext.JSON.decode(response.responseText),
-                    result = responseObj.data,
-                    instock = result.instock,
-                    preorders = result.preorders,
+                    result = responseObj.data;
+
+                let instock = 0;
+                let preorders = 0;
+                let orders = [];
+
+                if(result.instock) {
+                    instock = result.instock;
+                }
+
+                if(result.preorders) {
+                    preorders = result.preorders;
+                }
+
+                if(result.orders.length > 0) {
                     orders = result.orders;
+                }
 
                 me.articleInfoModel.beginEdit();
 
@@ -1056,6 +1081,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         let lastPosition = positionArray.pop();
         if(lastPosition) {
             me.calculateArticleProfit([lastPosition]);
+            me.fillArticleInfo([lastPosition]);
         }
     },
 
