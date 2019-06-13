@@ -60,17 +60,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.list.Grid', {
                     var record = event.record,
                         mainController = me.subApplication.getController('Main'),
                         number = editor.editor.items.items[1].getValue();
-
-                        if(number) {
-                            mainController.fillArticleInfo(number);
-                        }
-
+   
                     // Discounts do not support inline editing!
                     if (record.get('isDiscount') === true) {
                         return false;
-                    }
-
-                    
+                    }                    
                 }
             }
         });
@@ -435,7 +429,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.list.Grid', {
                     me.deletePositionsButton.setDisabled(selections.length === 0);
 
                     var products = [];
-
                     selections.forEach(function(selection) {
                         products.push({
                             articleNumber: selection.data.articleNumber,
@@ -447,6 +440,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.list.Grid', {
                     mainController = me.subApplication.getController('Main');
                     
                     mainController.calculateArticleProfit(products);
+                    mainController.fillArticleInfo(products);
                 }
             }
         });
