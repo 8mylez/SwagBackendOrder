@@ -49,12 +49,19 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
 {
     public function getArticleInfoAction()
     {
-        $articleNumber = $this->request->getParam('articleNumber');
+        $articleNumbers = $this->request->getParam('articleNumbers');
         $userID = $this->request->getParam('customerID');
+        $articleNumbers = json_decode($articleNumbers);
 
-        $preorders = $this->getPreorderCount($articleNumber);
-        $instock = $this->getInstock($articleNumber);
-        $orders = $this->getLastThreeOrders($articleNumber, $userID);
+        $preorders = 0;
+        $instock = 0;
+        $orders = [];
+
+        foreach($articleNumbers as $articleNumber) {
+            $preorders += $this->getPreorderCount($articleNumber);
+            $instock += $this->getInstock($articleNumber);
+            $orders = $this->getLastThreeOrders($articleNumber, $userID);
+        }
 
         $this->view->assign([
             'success' => true,

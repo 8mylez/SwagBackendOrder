@@ -150,14 +150,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.orderModel.set('currencyFactor', 1);
 
         me.currencyStore = me.subApplication.getStore('Currency').load();
-
-        // passed a user id
-        if (typeof me.subApplication.params !== 'undefined') {
-            if (me.subApplication.params.userId) {
-                me.onSelectCustomer(null, me.subApplication.params.userId);
-            }
-        }
-
         /**
          * initializes the window
          */
@@ -169,6 +161,13 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         }).show();
 
         me.updateArticleInfo();
+
+        // passed a user id
+        if (typeof me.subApplication.params !== 'undefined') {
+            if (me.subApplication.params.userId) {
+                me.onSelectCustomer(null, me.subApplication.params.userId);
+            }
+        }
 
         me.callParent(arguments);
     },
@@ -526,15 +525,21 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 columns[6].setRawValue(displayValue);
                 columns[6].selectedIndex = recordNumber;
                 updateButton.setDisabled(false);
-
-                me.fillArticleInfo(result.number);
             }
         });
 
     },
 
-    fillArticleInfo: function(articleNumber) {
+    fillArticleInfo: function(products) {
         var me = this;
+
+        let articleNumbers = [];
+
+        products.forEach(function(product) {
+            articleNumbers.push(
+                product.articleNumber
+            );
+        });
 
         if(!me.subApplication.getStore('Customer').getAt(0)) {
             return;
@@ -543,18 +548,37 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.articleInfoStore = me.subApplication.getStore('ArticleInfo');
         me.articleInfoModel = me.articleInfoStore.getAt(0);
 
+        if(products.length <= 0) {
+            me.updateArticleInfo();
+            
+            return false;
+        }
+
         Ext.Ajax.request({
             url: '{url action="getArticleInfo"}',
             params: {
-                articleNumber: articleNumber,
+                articleNumbers: Ext.JSON.encode(articleNumbers),
                 customerID: me.subApplication.getStore('Customer').getAt(0).get('id')
             },
             success: function(response) {
                 var responseObj = Ext.JSON.decode(response.responseText),
-                    result = responseObj.data,
-                    instock = result.instock,
-                    preorders = result.preorders,
+                    result = responseObj.data;
+
+                let instock = 0;
+                let preorders = 0;
+                let orders = [];
+
+                if(result.instock) {
+                    instock = result.instock;
+                }
+
+                if(result.preorders) {
+                    preorders = result.preorders;
+                }
+
+                if(result.orders.length > 0) {
                     orders = result.orders;
+                }
 
                 me.articleInfoModel.beginEdit();
 
@@ -725,18 +749,20 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 me.orderModel.set('paymentId', customerRecord.raw.paymentId);
-
+    
                 me.getPaymentView().paymentComboBox.setValue(customerRecord.raw.paymentId);
 
                 var billingId = customerRecord.raw.billing[0].id;
                 var billingRecord = me.getBillingView().billingAddressComboBox.store.getById(billingId);
                 var billingCombo = me.getBillingView().billingAddressComboBox;
-                
+
                 billingCombo.select(billingRecord.data.displayField);
+
                 billingCombo.fireEvent('select', billingCombo, [billingRecord]);
 
                 var firstShippingCost = me.getShippingCostsView().shippingArt.store.first();
                 var shippingCostCombo = me.getShippingCostsView().shippingArt;
+
                 shippingCostCombo.select(firstShippingCost.data.id);
                 shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
 
@@ -1055,6 +1081,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         let lastPosition = positionArray.pop();
         if(lastPosition) {
             me.calculateArticleProfit([lastPosition]);
+            me.fillArticleInfo([lastPosition]);
         }
     },
 
