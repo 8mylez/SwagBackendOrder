@@ -21,6 +21,9 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             ref: 'billingView', selector: 'createbackendorder-customer-billing'
         },
         {
+            ref: 'shippingView', selector: 'createbackendorder-customer-shipping'
+        },
+        {
             ref: 'shippingCostsView', selector: 'createbackendorder-shippingcosts'
         }
     ],
@@ -753,12 +756,28 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 me.getPaymentView().paymentComboBox.setValue(customerRecord.raw.paymentId);
 
                 var billingId = customerRecord.raw.billing[0].id;
+                if(customerRecord.raw.defaultBillingAddressId) {
+                    billingId = parseInt(customerRecord.raw.defaultBillingAddressId);
+                }
                 var billingRecord = me.getBillingView().billingAddressComboBox.store.getById(billingId);
                 var billingCombo = me.getBillingView().billingAddressComboBox;
 
                 billingCombo.select(billingRecord.data.displayField);
 
                 billingCombo.fireEvent('select', billingCombo, [billingRecord]);
+
+                if(customerRecord.raw.shippingIsDifferent) {
+                    me.getShippingView().billingAsShippingCheckbox.setValue(false);
+
+                    if(customerRecord.raw.defaultShippingAddressId) {
+                        var shippingRecord = me.getShippingView().shippingAddressComboBox.store.getById(parseInt(customerRecord.raw.defaultShippingAddressId));
+                        var shippingCombo = me.getShippingView().shippingAddressComboBox;
+
+                        shippingCombo.select(shippingRecord.data.displayField);
+
+                        shippingCombo.fireEvent('select', shippingCombo, [shippingRecord]);
+                    }
+                }
 
                 var firstShippingCost = me.getShippingCostsView().shippingArt.store.first();
                 var shippingCostCombo = me.getShippingCostsView().shippingArt;
