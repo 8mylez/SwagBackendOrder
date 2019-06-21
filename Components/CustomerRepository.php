@@ -13,6 +13,7 @@ use Shopware\Components\Model\QueryBuilder;
 use Shopware\Models\Customer\Address;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Customer\Group;
+use Doctrine\DBAL\Connection;
 
 class CustomerRepository
 {
@@ -22,11 +23,17 @@ class CustomerRepository
     private $modelManager;
 
     /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
      * @param ModelManager $modelManager
      */
-    public function __construct(ModelManager $modelManager)
+    public function __construct(ModelManager $modelManager, Connection $connection)
     {
         $this->modelManager = $modelManager;
+        $this->connection = $connection;
     }
 
     /**
@@ -53,6 +60,29 @@ class CustomerRepository
 
         $addressRepository = $this->modelManager->getRepository(Address::class);
         $customer['address'] = $addressRepository->getListArray($customerId);
+
+        $builder = $this->connection->createQueryBuilder();
+        $builder->select('u.id', 'u.default_billing_address_id', 'u.default_shipping_address_id')
+            ->from('s_user', 'u')
+            ->where('u.id = ?')
+            ->setParameter(0, $customerId);
+
+        $defaultAddresses = $builder->execute()->fetchAll();
+
+        if(isset($defaultAddresses) && !empty($defaultAddresses[0])) {
+            if(!empty($defaultAddresses[0]['default_billing_address_id'])) {                
+                $customer['defaultBillingAddressId'] = $defaultAddresses[0]['default_billing_address_id'];
+
+                if($defaultAddresses[0]['default_billing_address_id'] !== $defaultAddresses[0]['default_shipping_address_id']) {
+                    $customer['shippingIsDifferent'] = 1;
+                }
+            }
+
+            if(!empty($defaultAddresses[0]['default_shipping_address_id'])) {
+                $customer['defaultShippingAddressId'] = $defaultAddresses[0]['default_shipping_address_id'];
+            }
+        }
+
         $customer['billing'] = $customer['address'];
         $customer['shipping'] = $customer['address'];
         $customer['group'] = $this->getGroup($customer['groupKey']);

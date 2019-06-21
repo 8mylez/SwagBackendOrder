@@ -26,6 +26,7 @@
         <!-- Custom services -->
         <service id="swag_backend_order.customer_repository" class="SwagBackendOrder\Components\CustomerRepository">
             <argument type="service" id="models"/>
+            <argument type="service" id="dbal_connection"/>
         </service>
 
         <service id="swag_backend_order.order.order_hydrator" class="SwagBackendOrder\Components\Order\Hydrator\OrderHydrator">
