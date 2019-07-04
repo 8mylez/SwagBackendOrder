@@ -761,6 +761,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
                 var billingRecord = me.getBillingView().billingAddressComboBox.store.getById(billingId);
                 var billingCombo = me.getBillingView().billingAddressComboBox;
+                
+                if(billingRecord.raw.country.iso == "AT" && billingRecord.raw.vatId) {
+                    me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
+                    me.getTotalCostsOverview().taxFreeCheckbox.setValue(true);
+                }
 
                 billingCombo.select(billingRecord.data.displayField);
 
