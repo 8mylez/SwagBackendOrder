@@ -187,9 +187,9 @@ class ProductSearch implements ProductSearchInterface
         ShopContextInterface $shopContext,
         $getNetPrice = false
     ) {
-        if ($getNetPrice) {
-            return round($price, PriceResult::ROUND_PRECISION);
-        }
+        // if ($getNetPrice) {
+        //     return round($price, PriceResult::ROUND_PRECISION);
+        // }
 
         return $this->productPriceCalculator->calculatePrice($price, $tax, $shopContext);
     }
