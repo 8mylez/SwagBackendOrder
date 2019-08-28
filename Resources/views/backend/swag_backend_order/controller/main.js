@@ -761,11 +761,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
                 var billingRecord = me.getBillingView().billingAddressComboBox.store.getById(billingId);
                 var billingCombo = me.getBillingView().billingAddressComboBox;
-                
-                if(billingRecord.raw.country.iso == "AT" && billingRecord.raw.vatId) {
-                    me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
-                    me.getTotalCostsOverview().taxFreeCheckbox.setValue(true);
-                }
 
                 billingCombo.select(billingRecord.data.displayField);
 
@@ -794,6 +789,42 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(true);
                 } else {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
+                }
+
+                var euCountryCodes = [
+                    'BE',
+                    'BG',
+                    'CZ',
+                    'DK',
+                    'EE',
+                    'IE',
+                    'GR',
+                    'ES',
+                    'FR',
+                    'HR',
+                    'IT',
+                    'CY',
+                    'LV',
+                    'LT',
+                    'LU',
+                    'HU',
+                    'MT',
+                    'NL',
+                    'AT',
+                    'PL',
+                    'PT',
+                    'RO',
+                    'SI',
+                    'SK',
+                    'FI',
+                    'SE',
+                    'GB'
+                ];
+
+                if (euCountryCodes.includes(billingRecord.raw.country.iso) && billingRecord.raw.vatId)  {
+                    me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
+                    me.getTotalCostsOverview().taxFreeCheckbox.setValue(true);
+                    me.getTotalCostsOverview().taxFreeCheckbox.setDisabled(false);
                 }
 
                 me.window.setTitle(title);
