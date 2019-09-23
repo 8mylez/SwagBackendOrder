@@ -609,6 +609,57 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         ]);
     }
 
+    public function emzGetDispatchAction()
+    {
+        $vars = ['shopId', 'customergroupId', 'paymentId', 'countryId'];
+
+        foreach ($vars as $var) {
+            $$var = $this->Request()->getParam($var);
+
+            if (!$$var) {
+                return;
+            }
+        }
+
+        $qb = $this->get('dbal_connection')->createQueryBuilder();
+        
+        $dispatchId = $qb
+            ->select('pd.id')
+            ->from('s_premium_dispatch', 'pd')
+            ->leftJoin('pd', 's_premium_dispatch_paymentmeans', 'pdp', 'pdp.dispatchID = pd.id')
+            ->leftJoin('pd', 's_premium_dispatch_countries', 'pdc', 'pdc.dispatchID = pd.id')
+            ->where('pd.active = 1')
+            ->andWhere(
+                $qb->expr()->orX(
+                    'pd.multishopID IS NULL',
+                    'pd.multishopID = :shopId'
+                )
+            )
+            ->andWhere(
+                $qb->expr()->orX(
+                    'pd.customergroupID IS NULL',
+                    'pd.customergroupID = :customergroupId'
+                )
+            )
+            ->andWhere('pdp.paymentID = :paymentId')
+            ->andWhere('pdc.countryID = :countryId')
+            ->setParameters([
+                'shopId' => $shopId,
+                'customergroupId' => $customergroupId,
+                'paymentId' => $paymentId,
+                'countryId' => $countryId
+            ])
+            ->execute()
+            ->fetchColumn();
+
+        $this->view->assign([
+            'success' => true,
+            'data' => [
+                'dispatchId' => (int) $dispatchId
+            ]
+        ]);
+    }
+
     private function emzGetArticlePurchaseprice($articleNumber)
     {
         $queryBuilder = $this->container->get('dbal_connection')->createQueryBuilder();
