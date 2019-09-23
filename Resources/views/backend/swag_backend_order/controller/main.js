@@ -763,28 +763,54 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 var billingCombo = me.getBillingView().billingAddressComboBox;
 
                 billingCombo.select(billingRecord.data.displayField);
-
                 billingCombo.fireEvent('select', billingCombo, [billingRecord]);
 
-                if(customerRecord.raw.shippingIsDifferent) {
+                if (customerRecord.raw.shippingIsDifferent) {
                     me.getShippingView().billingAsShippingCheckbox.setValue(false);
 
-                    if(customerRecord.raw.defaultShippingAddressId) {
+                    if (customerRecord.raw.defaultShippingAddressId) {
                         var shippingRecord = me.getShippingView().shippingAddressComboBox.store.getById(parseInt(customerRecord.raw.defaultShippingAddressId));
                         var shippingCombo = me.getShippingView().shippingAddressComboBox;
 
                         shippingCombo.select(shippingRecord.data.displayField);
-
                         shippingCombo.fireEvent('select', shippingCombo, [shippingRecord]);
                     }
                 }
 
-                var firstShippingCost = me.getShippingCostsView().shippingArt.store.first();
-                var shippingCostCombo = me.getShippingCostsView().shippingArt;
+                var shippingCostCombo = me.getShippingCostsView().shippingArt,
+                    firstShippingCost = shippingCostCombo.store.first(),
+                    firstShippingCostId = firstShippingCost.data.id;
 
-                shippingCostCombo.select(firstShippingCost.data.id);
+                shippingCostCombo.select(firstShippingCostId);
                 shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
 
+                var addressRecord = shippingRecord ? shippingRecord : billingRecord,
+                    countryId = addressRecord.raw.country.id;
+
+                Ext.Ajax.request({
+                    url: '{url action="emzGetDispatch"}',
+                    params: {
+                        shopId: customerRecord.shop().getAt(0).get('id'),
+                        customergroupId: customerRecord.customerGroup().getAt(0).get('id'),
+                        paymentId: customerRecord.raw.paymentId,
+                        countryId: countryId
+                    },
+                    success: function (response) {
+                        var result = Ext.decode(response.responseText);
+
+                        if (!result || !result.success || !result.data.dispatchId) {
+                            return;
+                        }
+
+                        var shippingCostCombo = me.getShippingCostsView().shippingArt,
+                            emzShippingCostId = result.data.dispatchId,
+                            emzShippingCost = me.getShippingCostsView().shippingArt.store.findRecord('id', emzShippingCostId);
+
+                        shippingCostCombo.select(emzShippingCostId);
+                        shippingCostCombo.fireEvent('select', shippingCostCombo, [emzShippingCost]);
+                    }
+                });
+                
                 if (!customerRecord.customerGroup().getAt(0).get('tax')) {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(true);
                 } else {
