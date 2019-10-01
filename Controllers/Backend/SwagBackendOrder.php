@@ -99,24 +99,26 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
 
     private function getPreorderCount($articleNumber)
     {
-        $builder = $this->container->get('dbal_connection')->createQueryBuilder();
+        // $builder = $this->container->get('dbal_connection')->createQueryBuilder();
 
-        $builder->select('pickware_erp_warehouse_article_detail_stock_counts.stock, s_articles_details.instock')
-        ->from('s_articles_details')
-        ->rightJoin('s_articles_details', 'pickware_erp_warehouse_article_detail_stock_counts', null, 's_articles_details.id = pickware_erp_warehouse_article_detail_stock_counts.articleDetailId')
-        ->where('s_articles_details.ordernumber = ?')
-        ->setParameter(0, $articleNumber);
+        // $builder->select('pickware_erp_warehouse_article_detail_stock_counts.stock, s_articles_details.instock')
+        // ->from('s_articles_details')
+        // ->rightJoin('s_articles_details', 'pickware_erp_warehouse_article_detail_stock_counts', null, 's_articles_details.id = pickware_erp_warehouse_article_detail_stock_counts.articleDetailId')
+        // ->where('s_articles_details.ordernumber = ?')
+        // ->setParameter(0, $articleNumber);
 
-        $result = $builder->execute()->fetchAll();
+        // $result = $builder->execute()->fetchAll();
 
-        $instock = $result[0]["instock"];
-        $stock = 0;
+        // $instock = $result[0]["instock"];
+        // $stock = 0;
 
-        foreach ($result as $r) {
-            $stock += $r["stock"];
-        }
+        // foreach ($result as $r) {
+        //     $stock += $r["stock"];
+        // }
 
-        return $stock - $instock;
+        // return $stock - $instock;
+
+        return 1;
     }
 
     private function getInstock($articleNumber)
@@ -621,10 +623,15 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
             }
         }
 
+        $total = $this->Request()->getParam('total');
+
         $qb = $this->get('dbal_connection')->createQueryBuilder();
         
-        $dispatchId = $qb
-            ->select('pd.id')
+        $dispatchData = $qb
+            ->select([
+                'pd.id',
+                'pd.shippingfree'
+            ])
             ->from('s_premium_dispatch', 'pd')
             ->leftJoin('pd', 's_premium_dispatch_paymentmeans', 'pdp', 'pdp.dispatchID = pd.id')
             ->leftJoin('pd', 's_premium_dispatch_countries', 'pdc', 'pdc.dispatchID = pd.id')
@@ -650,12 +657,19 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
                 'countryId' => $countryId
             ])
             ->execute()
-            ->fetchColumn();
+            ->fetch();
+
+        $shippingfree = false;
+
+        if ($total && !is_null($dispatchData['shippingfree']) && ($dispatchData['shippingfree'] < $total)) {
+            $shippingfree = true;
+        }
 
         $this->view->assign([
             'success' => true,
             'data' => [
-                'dispatchId' => (int) $dispatchId
+                'dispatchId' => (int) $dispatchData['id'],
+                'shippingfree' => (boolean) $shippingfree
             ]
         ]);
     }
