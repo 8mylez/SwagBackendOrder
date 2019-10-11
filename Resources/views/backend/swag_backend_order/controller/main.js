@@ -817,37 +817,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
                 }
 
-                var euCountryCodes = [
-                    'BE',
-                    'BG',
-                    'CZ',
-                    'DK',
-                    'EE',
-                    'IE',
-                    'GR',
-                    'ES',
-                    'FR',
-                    'HR',
-                    'IT',
-                    'CY',
-                    'LV',
-                    'LT',
-                    'LU',
-                    'HU',
-                    'MT',
-                    'NL',
-                    'AT',
-                    'PL',
-                    'PT',
-                    'RO',
-                    'SI',
-                    'SK',
-                    'FI',
-                    'SE',
-                    'GB'
-                ];
-
-                if (euCountryCodes.includes(billingRecord.raw.country.iso) && billingRecord.raw.vatId)  {
+                if(billingRecord.raw.country.areaId === 3) {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
                     me.getTotalCostsOverview().taxFreeCheckbox.setValue(true);
                     me.getTotalCostsOverview().taxFreeCheckbox.setDisabled(false);
