@@ -67,6 +67,8 @@ class RequestHydrator
             $requestStruct->setBasketTaxRates($basketTaxRates);
         }
 
+        $requestStruct->setCustomerId((int) $data['customerId']);
+
         return $requestStruct;
     }
 
