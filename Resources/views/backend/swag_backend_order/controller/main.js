@@ -817,7 +817,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
                 }
 
-                if(billingRecord.raw.country.areaId === 3) {
+                if(billingRecord.raw.country.areaId === 2) {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
                     me.getTotalCostsOverview().taxFreeCheckbox.setValue(true);
                     me.getTotalCostsOverview().taxFreeCheckbox.setDisabled(false);
