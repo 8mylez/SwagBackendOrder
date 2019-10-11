@@ -590,7 +590,7 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
             $purchasePrices += ($this->emzGetArticlePurchaseprice($emzPositions[$row]->articleNumber) * $position->getQuantity());
         }
 
-        $dispatchPrice = $this->getShippingPrice($requestStruct);
+        $dispatchPrice = $this->getShippingPrice($requestStruct, $positionPrices);
 
         /** @var TotalPriceCalculator $totalPriceCalculator */
         $totalPriceCalculator = $this->get('swag_backend_order.price_calculation.total_price_calculator');
@@ -613,17 +613,29 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
 
     public function emzGetDispatchAction()
     {
-        $vars = ['shopId', 'customergroupId', 'paymentId', 'countryId'];
+        /**
+         * 0 => parameter-name
+         * 1 => required
+         */
+        $vars = [
+            ['shopId', 1],
+            ['customergroupId', 1],
+            ['paymentId', 1],
+            ['countryId', 1],
+            ['customerId', 1],
+            ['basketSum', 0],
+            ['total', 0]
+        ];
 
         foreach ($vars as $var) {
-            $$var = $this->Request()->getParam($var);
+            $varname = $var[0];
 
-            if (!$$var) {
+            $$varname = $this->Request()->getParam($varname);
+
+            if ($var[1] && !$$varname) {
                 return;
             }
         }
-
-        $total = $this->Request()->getParam('total');
 
         $qb = $this->get('dbal_connection')->createQueryBuilder();
         
@@ -665,6 +677,10 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
             $shippingfree = true;
         }
 
+        if (!$shippingfree) {
+            $shippingfree = $this->checkShippingfreeCustomer($customerId, $basketSum);
+        }
+
         $this->view->assign([
             'success' => true,
             'data' => [
@@ -672,6 +688,32 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
                 'shippingfree' => (boolean) $shippingfree
             ]
         ]);
+    }
+
+    /**
+     * Check, if the customer should be shippingfree
+     *
+     * @param int $customerId
+     * @param float $basketSum
+     * @return boolean
+     */
+    private function checkShippingfreeCustomer($customerId, $basketSum)
+    {
+        if (!$customerId) {
+            return false;
+        }
+
+        $shippingfree = false;
+
+        $customerAttributes = $this->get('shopware_attribute.data_loader')->load('s_user_attributes', $customerId);
+
+        if ($customerAttributes['emz_shipping_free_active']) {
+            if ($basketSum >= $customerAttributes['emz_shipping_free_value']) {
+                $shippingfree = true;
+            }
+        }
+
+        return $shippingfree;
     }
 
     private function emzGetArticlePurchaseprice($articleNumber)
@@ -923,10 +965,11 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
 
     /**
      * @param RequestStruct $requestStruct
+     * @param array $positionPrices
      *
      * @return PriceResult
      */
-    private function getShippingPrice($requestStruct)
+    private function getShippingPrice($requestStruct, $positionPrices)
     {
         $dispatchTaxRate = $this->getDispatchTaxRate($requestStruct->getDispatchId(), $requestStruct->getBasketTaxRates());
         /** @var PriceContextFactory $priceContextFactory */
@@ -934,15 +977,55 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         /** @var ShippingPriceCalculator $shippingCalculator */
         $shippingCalculator = $this->get('swag_backend_order.price_calculation.shipping_calculator');
 
+        $shippingData = $this->get('dbal_connection')->createQueryBuilder()
+            ->select([
+                'pd.shippingfree',
+                'psc.value'
+            ])
+            ->from('s_premium_dispatch', 'pd')
+            ->leftJoin('pd', 's_premium_shippingcosts', 'psc', 'psc.dispatchID = pd.id')
+            ->where('pd.id = :dispatchId')
+            ->setParameter('dispatchId', $requestStruct->getDispatchId())
+            ->groupBy('pd.id')
+            ->orderBy('psc.from', 'ASC')
+            ->execute()
+            ->fetch();
+
+        if ($requestStruct->isPreviousTaxFree()) {
+            $shippingData['value'] = $shippingData['value'] / ((100 + $dispatchTaxRate) / 100);
+        }
+
+        if (!$shippingData['value']) {
+            $shippingData['value'] = 0;
+        }
+
         // Get base/gross shipping costs (even if tax free)
         $previousPriceContext = $priceContextFactory->create(
-            $requestStruct->getShippingCosts(),
+            $shippingData['value'],
             $dispatchTaxRate,
             $requestStruct->isPreviousDisplayNet(),
             $requestStruct->isPreviousTaxFree(),
             $requestStruct->getPreviousCurrencyId()
         );
+
         $baseShippingPrice = $shippingCalculator->calculateBasePrice($previousPriceContext);
+
+        $sum = 0;
+
+        foreach ($positionPrices as $positionPrice) {
+            if ($requestStruct->isPreviousTaxFree()) {
+                $sum += $positionPrice->getNet();
+            }else {
+                $sum += $positionPrice->getGross();
+            }
+        }
+
+        if (
+            (!is_null($shippingData['shippingfree']) && $sum > $shippingData['shippingfree']) ||
+            $this->checkShippingfreeCustomer($requestStruct->getCustomerId(), $sum)            
+        ) {
+            $baseShippingPrice = 0;
+        }
 
         // Calculate actual gross & net shipping costs for order
         $currentPriceContext = $priceContextFactory->create(

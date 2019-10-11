@@ -534,8 +534,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 columns[6].setRawValue(displayValue);
                 columns[6].selectedIndex = recordNumber;
                 updateButton.setDisabled(false);
-
-                me.emzGetDispatch();
             }
         });
 
@@ -845,6 +843,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         var me = this,
             customerRecord = me.customerStore.getAt(0),
             billingId = customerRecord.raw.billing[0].id;
+          
+        if (typeof me.totalCostsModel === 'undefined') {
+            return;
+        }
 
         if (me.orderModel.get('billingAddressId')) {
             billingId = parseInt(me.orderModel.get('billingAddressId'));
@@ -860,6 +862,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             countryId = addressRecord.raw.country.id,
             params = {
                 shopId: customerRecord.shop().getAt(0).get('id'),
+                customerId: me.orderModel.get('customerId'),
+                basketSum: (me.totalCostsModel.get('totalWithoutTax') - me.totalCostsModel.get('shippingCostsNet')).toFixed(2),
                 customergroupId: customerRecord.customerGroup().getAt(0).get('id'),
                 paymentId: me.orderModel.get('paymentId'),
                 countryId: countryId
@@ -885,43 +889,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                 shippingCostCombo.select(emzShippingCostId);
                 shippingCostCombo.fireEvent('select', shippingCostCombo, [emzShippingCost]);
-
-                if (result.data.shippingfree) {
-                    if (me.totalCostsModel && me.shippingCostsFields) {
-                        me.totalCostsModel.set('shippingCosts', 0);
-                        me.totalCostsModel.set('shippingCostsNet', 0);
-                        me.shippingCostsFields[0].setValue(0);
-                        me.shippingCostsFields[1].setValue(0);
-                    }
-                }else {
-                    me.checkShippingFree();
-                }
-            }
-        });
-    },
-
-    checkShippingFree: function() {
-        var me = this;
-
-        Ext.Ajax.request({
-            url: '{url controller="EmzOrderExtend" action="checkShippingfreeCustomer"}',
-            params: {
-                customerId: me.orderModel.get('customerId'),
-                basketSum: (me.totalCostsModel.get('totalWithoutTax') - me.totalCostsModel.get('shippingCostsNet')).toFixed(2)
-            },
-            success: function (response) {
-                var customer = Ext.JSON.decode(response.responseText);
-
-                if (customer.success && customer.data.shippingfree) {
-                    me.totalCostsModel.set('shippingCosts', 0);
-                    me.totalCostsModel.set('shippingCostsNet', 0);
-                    me.shippingCostsFields[0].setValue(0);
-                    me.shippingCostsFields[1].setValue(0);
-                }else {
-                    var shippingCosts = me.subApplication.getStore('ShippingCosts').getById(me.orderModel.get('dispatchId')).get('value');
-                    me.totalCostsModel.set('shippingCosts', shippingCosts);
-                    me.shippingCostsFields[0].setValue(shippingCosts);
-                }
             }
         });
     },
@@ -1152,7 +1119,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 taxFree: me.orderModel.get('taxFree'),
                 previousDisplayNet: me.previousOrderModel.get('displayNet'),
                 previousTaxFree: me.previousOrderModel.get('taxFree'),
-                previousDispatchTaxRate: me.previousDispatchTaxRate
+                previousDispatchTaxRate: me.previousDispatchTaxRate,
+                customerId: me.orderModel.get('customerId')
             },
             success: function (response) {
                 var totalCostsJson = Ext.JSON.decode(response.responseText),
