@@ -99,26 +99,24 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
 
     private function getPreorderCount($articleNumber)
     {
-        // $builder = $this->container->get('dbal_connection')->createQueryBuilder();
+        $builder = $this->container->get('dbal_connection')->createQueryBuilder();
 
-        // $builder->select('pickware_erp_warehouse_article_detail_stock_counts.stock, s_articles_details.instock')
-        // ->from('s_articles_details')
-        // ->rightJoin('s_articles_details', 'pickware_erp_warehouse_article_detail_stock_counts', null, 's_articles_details.id = pickware_erp_warehouse_article_detail_stock_counts.articleDetailId')
-        // ->where('s_articles_details.ordernumber = ?')
-        // ->setParameter(0, $articleNumber);
+        $builder->select('pickware_erp_warehouse_article_detail_stock_counts.stock, s_articles_details.instock')
+        ->from('s_articles_details')
+        ->rightJoin('s_articles_details', 'pickware_erp_warehouse_article_detail_stock_counts', null, 's_articles_details.id = pickware_erp_warehouse_article_detail_stock_counts.articleDetailId')
+        ->where('s_articles_details.ordernumber = ?')
+        ->setParameter(0, $articleNumber);
 
-        // $result = $builder->execute()->fetchAll();
+        $result = $builder->execute()->fetchAll();
 
-        // $instock = $result[0]["instock"];
-        // $stock = 0;
+        $instock = $result[0]["instock"];
+        $stock = 0;
 
-        // foreach ($result as $r) {
-        //     $stock += $r["stock"];
-        // }
+        foreach ($result as $r) {
+            $stock += $r["stock"];
+        }
 
-        // return $stock - $instock;
-
-        return 1;
+        return $stock - $instock;
     }
 
     private function getInstock($articleNumber)
