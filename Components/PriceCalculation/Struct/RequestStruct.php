@@ -71,6 +71,11 @@ class RequestStruct
     private $previousDisplayNet;
 
     /**
+     * @var int
+     */
+    private $customerId;
+
+    /**
      * @return PositionStruct[]
      */
     public function getPositions()
@@ -276,5 +281,21 @@ class RequestStruct
     public function setPreviousShippingTaxRate($previousShippingTaxRate)
     {
         $this->previousShippingTaxRate = $previousShippingTaxRate;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCustomerId()
+    {
+        return $this->customerId;
+    }
+
+    /**
+     * @param int $customerId
+     */
+    public function setCustomerId($customerId)
+    {
+        $this->customerId = $customerId;
     }
 }
