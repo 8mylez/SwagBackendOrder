@@ -8,15 +8,22 @@ Ext.define('Shopware.apps.EmzCustomerPopup.controller.Detail', {
 
         me.callParent(arguments);
 
-        var customerID = record.data.customerId;
+        var customerID = record.data.customerId,
+            customerStore = Ext.create('Shopware.apps.Customer.store.Detail');
         
-        if(record.getCustomerStore.data.items.length > 0) {
-            var comment = record.getCustomerStore.data.items[0].data.internalComment;
+        customerStore.getProxy().extraParams.customerID = customerID;
 
-            if(comment != "") {
-                alert(comment);
+        customerStore.load({
+            callback: function(records) {
+                if(records.length > 0) {
+                    var comment = records[0].data.internalComment;
+
+                    if(comment != null && comment != "") {
+                        alert(comment);
+                    }
+                }
             }
-        }
+        });
     }
 });
 //{/block}
