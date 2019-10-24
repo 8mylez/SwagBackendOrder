@@ -783,12 +783,20 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     }
                 }
 
-                var shippingCostCombo = me.getShippingCostsView().shippingArt,
-                    firstShippingCost = shippingCostCombo.store.first(),
-                    firstShippingCostId = firstShippingCost.data.id;
+                var shippingCostCombo = me.getShippingCostsView().shippingArt;
+                
+                shippingCostCombo.store.on('load', function () {
+                    var firstShippingCost = shippingCostCombo.store.first();
 
-                shippingCostCombo.select(firstShippingCostId);
-                shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
+                    if (shippingCostCombo && firstShippingCost && firstShippingCost.data) {
+                        var firstShippingCostId = firstShippingCost.data.id;
+
+                        if (firstShippingCostId) {
+                            shippingCostCombo.select(firstShippingCostId);
+                            shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
+                        }
+                    }
+                });
 
                 me.emzGetDispatch();
                 
