@@ -798,7 +798,44 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
                 }
 
-                if(billingRecord.raw.country.areaId === 2) {
+                var euCountryCodes = [
+                    'BE',
+                    'BG',
+                    'CZ',
+                    'DK',
+                    'EE',
+                    'IE',
+                    'GR',
+                    'ES',
+                    'FR',
+                    'HR',
+                    'IT',
+                    'CY',
+                    'LV',
+                    'LT',
+                    'LU',
+                    'LI',
+                    'HU',
+                    'MT',
+                    'NL',
+                    'AT',
+                    'PL',
+                    'PT',
+                    'RO',
+                    'SI',
+                    'SK',
+                    'FI',
+                    'SE',
+                    'GB',
+                    'CH',
+                    'MC',
+                    'NO',
+                    'SM',
+                    'RS',
+                    'VA'
+                ];
+
+                if (euCountryCodes.includes(billingRecord.raw.country.iso) && billingRecord.raw.vatId)  {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(false);
                     me.getTotalCostsOverview().taxFreeCheckbox.setValue(true);
                     me.getTotalCostsOverview().taxFreeCheckbox.setDisabled(false);
@@ -840,7 +877,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             };
 
         if (me.totalCostsModel) {
-            params.total = me.totalCostsModel.get('total');
+            // params.total = me.totalCostsModel.get('total');
+            params.total = params.basketSum;
         }
 
         Ext.Ajax.request({
