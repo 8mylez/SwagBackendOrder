@@ -1,6 +1,6 @@
 <?php
 /**
- * (c) shopware AG <info@shopware.com>
+ * (c) shopware AG <info@shopware.com>.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -37,7 +37,7 @@ class Order implements SubscriberInterface
     }
 
     /**
-     * adds the templates directories which expand the order module
+     * adds the templates directories which expand the order module.
      *
      * @param \Enlight_Controller_ActionEventArgs $args
      */
@@ -47,12 +47,16 @@ class Order implements SubscriberInterface
 
         // Add view directory
         $args->getSubject()->View()->addTemplateDir(
-            $this->getPluginPath() . '/Resources/views/'
+            $this->getPluginPath().'/Resources/views/'
         );
 
         if ($args->getRequest()->getActionName() === 'load') {
             $view->extendsTemplate(
                 'backend/order/view/create_backend_order/list.js'
+            );
+
+            $view->extendsTemplate(
+                'backend/order/controller/emz_customer_popup/detail.js'
             );
         }
     }
