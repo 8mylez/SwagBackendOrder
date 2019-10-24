@@ -1011,11 +1011,7 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
         $sum = 0;
 
         foreach ($positionPrices as $positionPrice) {
-            if ($requestStruct->isPreviousTaxFree()) {
-                $sum += $positionPrice->getNet();
-            }else {
-                $sum += $positionPrice->getGross();
-            }
+            $sum += $positionPrice->getNet();
         }
 
         if (

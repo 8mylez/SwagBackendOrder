@@ -814,6 +814,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     'LV',
                     'LT',
                     'LU',
+                    'LI',
                     'HU',
                     'MT',
                     'NL',
@@ -825,7 +826,13 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     'SK',
                     'FI',
                     'SE',
-                    'GB'
+                    'GB',
+                    'CH',
+                    'MC',
+                    'NO',
+                    'SM',
+                    'RS',
+                    'VA'
                 ];
 
                 if (euCountryCodes.includes(billingRecord.raw.country.iso) && billingRecord.raw.vatId)  {
@@ -870,7 +877,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             };
 
         if (me.totalCostsModel) {
-            params.total = me.totalCostsModel.get('total');
+            // params.total = me.totalCostsModel.get('total');
+            params.total = params.basketSum;
         }
 
         Ext.Ajax.request({
