@@ -783,12 +783,20 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     }
                 }
 
-                var shippingCostCombo = me.getShippingCostsView().shippingArt,
-                    firstShippingCost = shippingCostCombo.store.first(),
-                    firstShippingCostId = firstShippingCost.data.id;
+                var shippingCostCombo = me.getShippingCostsView().shippingArt;
+                
+                shippingCostCombo.store.on('load', function () {
+                    var firstShippingCost = shippingCostCombo.store.first();
 
-                shippingCostCombo.select(firstShippingCostId);
-                shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
+                    if (shippingCostCombo && firstShippingCost && firstShippingCost.data) {
+                        var firstShippingCostId = firstShippingCost.data.id;
+
+                        if (firstShippingCostId) {
+                            shippingCostCombo.select(firstShippingCostId);
+                            shippingCostCombo.fireEvent('select', shippingCostCombo, [firstShippingCost]);
+                        }
+                    }
+                });
 
                 me.emzGetDispatch();
                 
@@ -814,6 +822,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     'LV',
                     'LT',
                     'LU',
+                    'LI',
                     'HU',
                     'MT',
                     'NL',
@@ -825,7 +834,13 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     'SK',
                     'FI',
                     'SE',
-                    'GB'
+                    'GB',
+                    'CH',
+                    'MC',
+                    'NO',
+                    'SM',
+                    'RS',
+                    'VA'
                 ];
 
                 if (euCountryCodes.includes(billingRecord.raw.country.iso) && billingRecord.raw.vatId)  {
@@ -870,7 +885,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             };
 
         if (me.totalCostsModel) {
-            params.total = me.totalCostsModel.get('total');
+            // params.total = me.totalCostsModel.get('total');
+            params.total = params.basketSum;
         }
 
         Ext.Ajax.request({
