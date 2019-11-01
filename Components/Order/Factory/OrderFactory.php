@@ -1,6 +1,6 @@
 <?php
 /**
- * (c) shopware AG <info@shopware.com>
+ * (c) shopware AG <info@shopware.com>.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -24,6 +24,7 @@ use Shopware\Models\Payment\Payment;
 use Shopware\Models\Payment\PaymentInstance;
 use Shopware\Models\Shop\Currency;
 use Shopware\Models\Shop\Shop;
+use Shopware\Models\Tax\Tax;
 use SwagBackendOrder\Components\Order\Struct\OrderStruct;
 use SwagBackendOrder\Components\Order\Struct\PositionStruct;
 
@@ -93,6 +94,8 @@ class OrderFactory
         $order->setInvoiceAmount($orderStruct->getTotal());
         $order->setInvoiceAmountNet($orderStruct->getTotalWithoutTax());
 
+        $order->setInvoiceShippingTaxRate($this->getInvoiceShippingTaxRate($dispatch, $orderStruct));
+
         $order->setShop($customer->getShop());
 
         $order->setOrderTime(new \DateTime());
@@ -154,6 +157,29 @@ class OrderFactory
         $connection->executeQuery($sql, [$orderStruct->getNumber()]);
 
         return $this->modelManager->find(Order::class, $connection->lastInsertId());
+    }
+
+    private function getInvoiceShippingTaxRate($dispatch, $orderStruct)
+    {
+        if ($orderStruct->isTaxFree()) {
+            return 0.0;
+        }
+
+        if ($dispatch->getTaxCalculation()) {
+            $tax = $this->modelManager->find(Tax::class, $dispatch->getTaxCalculation());
+
+            return $tax->getTax();
+        }
+
+        $taxRate = 0.0;
+
+        foreach ($orderStruct->getPositions() as $position) {
+            if ($position->getTaxRate() > $taxRate) {
+                $taxRate = $position->getTaxRate();
+            }
+        }
+
+        return floatval($taxRate);
     }
 
     /**
