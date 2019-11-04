@@ -515,7 +515,7 @@ class Shopware_Models_Document_Order extends Enlight_Class implements Enlight_Ho
                 }
 
                 if ($this->_net == true) {
-                    $position['netto'] = round($position['price'], 2);
+                    $position['netto'] = $position['price'];
                     $position['price'] = round($position['price'], 2) * (1 + $position['tax'] / 100);
                 } else {
                     $position['netto'] = $position['price'] / (100 + $position['tax']) * 100;
