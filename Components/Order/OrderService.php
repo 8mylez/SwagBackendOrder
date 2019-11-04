@@ -73,6 +73,7 @@ class OrderService implements OrderServiceInterface
             throw new InvalidOrderException('Invalid ' . OrderStruct::class . 'given.');
         }
 
+        /** @var Order $order */
         $order = $this->orderFactory->create($orderStruct);
 
         $this->modelManager->persist($order);
