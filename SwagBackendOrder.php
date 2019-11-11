@@ -8,8 +8,8 @@
 
 namespace SwagBackendOrder;
 
-require_once 'Models/Order/Order.php';
-require_once 'Models/Document/Order.php';
+// require_once 'Models/Order/Order.php';
+// require_once 'Models/Document/Order.php';
 
 use Shopware\Bundle\PluginInstallerBundle\Service\InstallerService;
 use Shopware\Components\Plugin;
@@ -94,7 +94,7 @@ class SwagBackendOrder extends Plugin
             'label' => 'Lieferdatum',
             'displayInBackend' => true,
             'custom' => false
-        ]);  
+        ]);
     }
 
     private function removeAttributes() {
