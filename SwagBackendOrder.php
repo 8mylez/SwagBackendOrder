@@ -8,6 +8,9 @@
 
 namespace SwagBackendOrder;
 
+require_once 'Models/Order/Order.php';
+require_once 'Models/Document/Order.php';
+
 use Shopware\Bundle\PluginInstallerBundle\Service\InstallerService;
 use Shopware\Components\Plugin;
 use Shopware\Components\Plugin\Context\InstallContext;
