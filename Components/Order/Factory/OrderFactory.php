@@ -120,6 +120,12 @@ class OrderFactory
             $order->setNet(1);
         }
 
+        if ($orderStruct->getNetOrder()) {
+            $shippingCosts = 0.0;
+            $shippingCosts = $orderStruct->getShippingCostsNet() * 1.19;
+            $order->setInvoiceShipping($shippingCosts);
+        }
+
         /** @var Currency $currency */
         $currency = $this->modelManager->getReference(Currency::class, $orderStruct->getCurrencyId());
         $order->setCurrencyFactor($currency->getFactor());
