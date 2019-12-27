@@ -1,6 +1,6 @@
 <?php
 /**
- * (c) shopware AG <info@shopware.com>
+ * (c) shopware AG <info@shopware.com>.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -86,7 +86,7 @@ class ProductSearch implements ProductSearchInterface
     public function findProducts($searchTerm, $shopId, $limit = 10, $offset = 0)
     {
         // Escape "_" (MySQL wildcards) and surround with "%" (MySQL wildcards)
-        $searchTerm = '%' . str_replace('_', '\_', $searchTerm) . '%';
+        $searchTerm = '%'.str_replace('_', '\_', $searchTerm).'%';
 
         $queryBuilder = $this->getSearchBaseQuery();
         $searchResult = $queryBuilder
@@ -281,6 +281,7 @@ class ProductSearch implements ProductSearchInterface
         $queryBuilder = $this->connection->createQueryBuilder();
 
         return $queryBuilder->select([
+            'article.id as articleId',
             'article.name',
             'article.active AS articleActive',
             'details.ordernumber AS number',
