@@ -321,11 +321,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     case 'new':
                         me.window.close();
 
-                        // if (Ext.isDefined(orderManager[0])) {
-                        //     var store = orderManager[0].listStore;
-                        //     store.getProxy().extraParams.orderID = null;
-                        //     store.load();
-                        // }
+                        if (Ext.isDefined(orderManager[0])) {
+                            var store = orderManager[0].listStore;
+
+                            if(store.getProxy().extraParams) {
+                                store.getProxy().extraParams.orderID = null;
+                                store.load();
+                            }
+                        }
 
                         if (response.proxy.reader.rawData.mail) {
                             Shopware.Notification.createGrowlMessage(me.snippets.error.mailTitle, me.mailErrorMessage);
@@ -340,11 +343,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     case 'close':
                         me.window.close();
 
-                        // if (Ext.isDefined(orderManager[0])) {
-                        //     var store = orderManager[0].listStore;
-                        //     store.getProxy().extraParams.orderID = null;
-                        //     store.load();
-                        // }
+                        if (Ext.isDefined(orderManager[0])) {
+                            var store = orderManager[0].listStore;
+                            
+                            if(store.getProxy().extraParams) {
+                                store.getProxy().extraParams.orderID = null;
+                                store.load();
+                            }
+                        }
 
                         break;
                     case 'detail':
@@ -363,11 +369,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                         Shopware.Notification.createGrowlMessage(me.snippets.success.title, me.snippets.success.text + ' - ' + me.ordernumber);
                         me.window.close();
 
-                        // if (Ext.isDefined(orderManager[0])) {
-                        //     var store = orderManager[0].listStore;
-                        //     store.getProxy().extraParams.orderID = null;
-                        //     store.load();
-                        // }
+                        if (Ext.isDefined(orderManager[0])) {
+                            var store = orderManager[0].listStore;
+                            
+                            if(store.getProxy().extraParams) {
+                                store.getProxy().extraParams.orderID = null;
+                                store.load();
+                            }
+                        }
 
                         break;
                     default:
