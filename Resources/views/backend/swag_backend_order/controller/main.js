@@ -323,8 +323,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                         if (Ext.isDefined(orderManager[0])) {
                             var store = orderManager[0].listStore;
-                            store.getProxy().extraParams.orderID = null;
-                            store.load();
+
+                            if(store.getProxy().extraParams) {
+                                store.getProxy().extraParams.orderID = null;
+                                store.load();
+                            }
                         }
 
                         if (response.proxy.reader.rawData.mail) {
@@ -342,8 +345,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                         if (Ext.isDefined(orderManager[0])) {
                             var store = orderManager[0].listStore;
-                            store.getProxy().extraParams.orderID = null;
-                            store.load();
+                            
+                            if(store.getProxy().extraParams) {
+                                store.getProxy().extraParams.orderID = null;
+                                store.load();
+                            }
                         }
 
                         break;
@@ -365,8 +371,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                         if (Ext.isDefined(orderManager[0])) {
                             var store = orderManager[0].listStore;
-                            store.getProxy().extraParams.orderID = null;
-                            store.load();
+                            
+                            if(store.getProxy().extraParams) {
+                                store.getProxy().extraParams.orderID = null;
+                                store.load();
+                            }
                         }
 
                         break;
