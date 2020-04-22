@@ -5,12 +5,17 @@
     <label lang="de">Backend Bestellungen</label>
     <label lang="en">Backend orders</label>
 
-    <version>2.8.5</version>
+    <version>2.8.6</version>
     <copyright>(c) by shopware AG</copyright>
     <license>proprietary</license>
     <link>http://store.shopware.com</link>
     <author>shopware AG</author>
     <compatibility minVersion="5.5.0"/>
+
+    <changelog version="2.8.6">
+        <changes lang="de">Versandkostenfrei bei Backend Bestellungen funktioniert wieder korrekt</changes>
+        <changes lang="en">Fix bug for backend orders</changes>
+    </changelog>
 
     <changelog version="2.8.5">
         <changes lang="de">Check auf Extra-Parameter hinzugefügt</changes>

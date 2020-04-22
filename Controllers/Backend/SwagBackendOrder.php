@@ -1014,8 +1014,10 @@ class Shopware_Controllers_Backend_SwagBackendOrder extends Shopware_Controllers
             $sum += $positionPrice->getNet();
         }
 
+        $b2bShippingFree = $shippingData['shippingfree'] / ((100 + $dispatchTaxRate) / 100);
+
         if (
-            (!is_null($shippingData['shippingfree']) && $sum > $shippingData['shippingfree']) ||
+            (!is_null($shippingData['shippingfree']) && $sum > $b2bShippingFree) ||
             $this->checkShippingfreeCustomer($requestStruct->getCustomerId(), $sum)            
         ) {
             $baseShippingPrice = 0;
