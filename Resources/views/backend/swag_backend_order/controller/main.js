@@ -335,10 +335,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                         }
                         Shopware.Notification.createGrowlMessage(me.snippets.success.title, me.snippets.success.text + me.ordernumber);
 
-                        Shopware.app.Application.addSubApplication({
-                            name: 'Shopware.apps.SwagBackendOrder',
-                            action: 'detail'
-                        });
+                        // Shopware.app.Application.addSubApplication({
+                        //     name: 'Shopware.apps.SwagBackendOrder',
+                        //     action: 'detail'
+                        // });
                         break;
                     case 'close':
                         me.window.close();
@@ -354,15 +354,15 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                         break;
                     case 'detail':
-                        if (me.orderId > 0) {
-                            Shopware.app.Application.addSubApplication({
-                                name: 'Shopware.apps.Order',
-                                action: 'detail',
-                                params: {
-                                    orderId: me.orderId
-                                }
-                            });
-                        }
+                        // if (me.orderId > 0) {
+                        //     Shopware.app.Application.addSubApplication({
+                        //         name: 'Shopware.apps.Order',
+                        //         action: 'detail',
+                        //         params: {
+                        //             orderId: me.orderId
+                        //         }
+                        //     });
+                        // }
                         if (response.proxy.reader.rawData.mail) {
                             Shopware.Notification.createGrowlMessage(me.snippets.error.mailTitle, me.mailErrorMessage);
                         }
