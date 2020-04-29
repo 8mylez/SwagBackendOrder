@@ -325,8 +325,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                             var store = orderManager[0].listStore;
 
                             if(store.getProxy().extraParams) {
-                                store.getProxy().extraParams.orderID = null;
-                                store.load();
+                                // store.getProxy().extraParams.orderID = null;
+                                // store.load();
                             }
                         }
 
@@ -345,10 +345,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                         if (Ext.isDefined(orderManager[0])) {
                             var store = orderManager[0].listStore;
-                            
+
                             if(store.getProxy().extraParams) {
-                                store.getProxy().extraParams.orderID = null;
-                                store.load();
+                                // store.getProxy().extraParams.orderID = null;
+                                // store.load();
                             }
                         }
 
@@ -371,10 +371,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                         if (Ext.isDefined(orderManager[0])) {
                             var store = orderManager[0].listStore;
-                            
+
                             if(store.getProxy().extraParams) {
-                                store.getProxy().extraParams.orderID = null;
-                                store.load();
+                                // store.getProxy().extraParams.orderID = null;
+                                // store.load();
                             }
                         }
 
@@ -568,7 +568,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
         if(products.length <= 0) {
             me.updateArticleInfo();
-            
+
             return false;
         }
 
@@ -632,7 +632,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.articleInfoModel.set('price3', 0);
                     me.articleInfoModel.set('quantity3', 0);
                 }
-                
+
                 me.articleInfoModel.endEdit();
             }
         });
@@ -669,7 +669,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             success: function(response) {
                 var responseObj = Ext.JSON.decode(response.responseText),
                     result = responseObj.data;
-                   
+
                 let profitPerSelection = 0.00;
                 let purchasePricePerSelection = 0.00;
                 let selectionTotal = 0.00;
@@ -703,7 +703,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
      * @param eOpts
      */
     onCancelEdit: function (grid, eOpts) {
-        var me = this, 
+        var me = this,
             record = eOpts.record,
             store = eOpts.store;
 
@@ -767,7 +767,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 me.orderModel.set('paymentId', customerRecord.raw.paymentId);
-    
+
                 me.getPaymentView().paymentComboBox.setValue(customerRecord.raw.paymentId);
 
                 var billingId = customerRecord.raw.billing[0].id;
@@ -793,7 +793,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 var shippingCostCombo = me.getShippingCostsView().shippingArt;
-                
+
                 shippingCostCombo.store.on('load', function () {
                     var firstShippingCost = shippingCostCombo.store.first();
 
@@ -808,7 +808,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 });
 
                 me.emzGetDispatch();
-                
+
                 if (!customerRecord.customerGroup().getAt(0).get('tax')) {
                     me.getTotalCostsOverview().displayNetCheckbox.setValue(true);
                 } else {
@@ -867,7 +867,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         var me = this,
             customerRecord = me.customerStore.getAt(0),
             billingId = customerRecord.raw.billing[0].id;
-          
+
         if (typeof me.totalCostsModel === 'undefined') {
             return;
         }
@@ -1016,10 +1016,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.articleInfoModel = me.articleInfoStore.getAt(0);
 
         me.articleInfoModel.beginEdit();
-        
+
         me.articleInfoModel.set('instock', '');
         me.articleInfoModel.set('preorders', '');
-        
+
         me.articleInfoModel.set('ordernumber1', '');
         me.articleInfoModel.set('ordernumber2', '');
         me.articleInfoModel.set('ordernumber3', '');
@@ -1130,7 +1130,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             positionArray.push(record.data);
         });
         var positionJsonString = Ext.JSON.encode(positionArray);
-        
+
         Ext.Ajax.request({
             url: '{url action="calculateBasket"}',
             params: {
