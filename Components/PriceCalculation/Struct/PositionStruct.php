@@ -26,7 +26,7 @@ class PositionStruct
     private $total;
 
     /**
-     * @var int
+     * @var float
      */
     private $taxRate;
 
@@ -46,6 +46,14 @@ class PositionStruct
     public function getPrice()
     {
         return $this->price;
+    }
+
+    /**
+     * @return float
+     */
+    public function getNetPrice()
+    {
+        return (float) $this->price / (1.0 + ($this->taxRate / 100));
     }
 
     /**
@@ -89,7 +97,7 @@ class PositionStruct
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTaxRate()
     {
@@ -97,7 +105,7 @@ class PositionStruct
     }
 
     /**
-     * @param int $taxRate
+     * @param float $taxRate
      */
     public function setTaxRate($taxRate)
     {

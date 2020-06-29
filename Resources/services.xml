@@ -5,6 +5,8 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <defaults public="true"/>
+
         <!-- Subscriber -->
         <service id="swag_backend_order.subscriber.backend_controller" class="SwagBackendOrder\Subscriber\BackendController">
             <argument type="service" id="service_container"/>
@@ -118,11 +120,11 @@
         </service>
 
         <service id="swag_backend_order.payment_translator" class="SwagBackendOrder\Components\Translation\PaymentTranslator">
-            <factory class="SwagBackendOrder\Components\Translation\PaymentTranslator" method="create"/>
+            <argument type="service" id="translation" />
         </service>
 
         <service id="swag_backend_order.shipping_translator" class="SwagBackendOrder\Components\Translation\ShippingTranslator">
-            <factory class="SwagBackendOrder\Components\Translation\ShippingTranslator" method="create"/>
+            <argument type="service" id="translation" />
         </service>
 
         <service id="swag_backend_order.product_search" class="SwagBackendOrder\Components\ProductSearch\ProductSearch">
@@ -131,6 +133,13 @@
             <argument type="service" id="shopware_storefront.context_service" />
             <argument type="service" id="swag_backend_order.price_calculation.request_hydrator" />
             <argument type="service" id="shopware_storefront.additional_text_service" />
+        </service>
+
+        <service id="swag_backend_order.b2b_order_service" class="SwagBackendOrder\Components\Order\B2BOrderService">
+            <argument type="service" id="b2b_order.conversion_service" on-invalid="null"/>
+            <argument type="service" id="b2b_front_auth.login_context" on-invalid="null"/>
+            <argument type="service" id="b2b_front_auth.credential_builder" on-invalid="null"/>
+            <argument type="service" id="b2b_sales_representative.client_debtor_authentication_identity_loader" on-invalid="null"/>
         </service>
 
     </services>

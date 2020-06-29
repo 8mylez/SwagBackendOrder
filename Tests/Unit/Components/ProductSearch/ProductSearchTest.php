@@ -8,6 +8,7 @@
 
 namespace SwagBackendOrder\Tests\Unit\Components\ProductSearch;
 
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SwagBackendOrder\Components\PriceCalculation\Calculator\ProductPriceCalculator;
 use SwagBackendOrder\Components\PriceCalculation\CurrencyConverter;
@@ -17,7 +18,7 @@ use SwagBackendOrder\Components\PriceCalculation\TaxCalculation;
 use SwagBackendOrder\Components\ProductSearch\ProductSearch;
 use SwagBackendOrder\Tests\KernelTestCaseTrait;
 
-class ProductSearchTest extends \PHPUnit_Framework_TestCase
+class ProductSearchTest extends TestCase
 {
     use KernelTestCaseTrait;
 
@@ -41,7 +42,8 @@ class ProductSearchTest extends \PHPUnit_Framework_TestCase
             'to' => 'beliebig',
         ];
 
-        $this->assertArraySubset($expectedProduct, $result);
+        static::assertSame($expectedProduct['price'], $result['price']);
+        static::assertSame($expectedProduct['to'], $result['to']);
     }
 
     public function test_prepareProductPrice_with_price_from_default_customerGroup()
@@ -65,7 +67,9 @@ class ProductSearchTest extends \PHPUnit_Framework_TestCase
             'isFallbackPrice' => true,
         ];
 
-        $this->assertArraySubset($expectedProduct, $result);
+        static::assertSame($expectedProduct['price'], $result['price']);
+        static::assertSame($expectedProduct['to'], $result['to']);
+        static::assertSame($expectedProduct['isFallbackPrice'], $result['isFallbackPrice']);
     }
 
     private function getService()

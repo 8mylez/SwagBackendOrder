@@ -20,16 +20,12 @@ use SwagBackendOrder\Components\Order\Validator\InvalidOrderException;
 
 class DetailFactory
 {
-    /** @var ModelManager $modelManager */
+    /** @var ModelManager */
     private $modelManager;
 
-    /** @var \sArticles $articleModule */
+    /** @var \sArticles */
     private $articleModule;
 
-    /**
-     * @param ModelManager $modelManager
-     * @param Modules      $modules
-     */
     public function __construct(ModelManager $modelManager, Modules $modules)
     {
         $this->modelManager = $modelManager;
@@ -37,8 +33,7 @@ class DetailFactory
     }
 
     /**
-     * @param PositionStruct $positionStruct
-     * @param bool           $isTaxFree
+     * @param bool $isTaxFree
      *
      * @throws InvalidOrderException
      *
@@ -66,6 +61,7 @@ class DetailFactory
         if (!$isTaxFree) {
             $detail->setTax($tax);
         }
+
         $detail->setTaxRate($tax->getTax());
 
         $detail->setEsdArticle(0);
@@ -75,6 +71,7 @@ class DetailFactory
         $detail->setStatus($detailStatus);
 
         $detail->setArticleId($article->getId());
+        $detail->setArticleDetail($articleDetail);
         $name = $this->articleModule->sGetArticleNameByOrderNumber($positionStruct->getNumber());
         $detail->setArticleName($name);
         $detail->setArticleNumber($positionStruct->getNumber());
@@ -85,13 +82,13 @@ class DetailFactory
         $detail->setUnit($articleDetail->getUnit() ? $articleDetail->getUnit()->getName() : 0);
         $detail->setPackUnit($articleDetail->getPackUnit());
         $detail->setAttribute($this->createDetailAttribute());
+        $detail->setEan($positionStruct->getEan());
 
         return $detail;
     }
 
     /**
-     * @param PositionStruct $positionStruct
-     * @param bool           $isTaxFree
+     * @param bool $isTaxFree
      *
      * @return Detail
      */

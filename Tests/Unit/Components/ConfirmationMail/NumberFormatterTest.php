@@ -8,10 +8,11 @@
 
 namespace SwagBackendOrder\Tests\Unit\Components\ConfirmationMail;
 
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use SwagBackendOrder\Components\ConfirmationMail\NumberFormatterWrapper;
 
-class NumberFormatterTest extends \PHPUnit_Framework_TestCase
+class NumberFormatterTest extends TestCase
 {
     const LOCALE_GERMANY = 'de_DE';
     const LOCALE_GREAT_BRITAIN = 'en_EN';
@@ -22,7 +23,7 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         $numberFormatterWrapper = new NumberFormatterWrapper();
 
-        $this->assertInstanceOf(NumberFormatterWrapper::class, $numberFormatterWrapper);
+        static::assertInstanceOf(NumberFormatterWrapper::class, $numberFormatterWrapper);
     }
 
     public function test_it_should_format_number_for_locale_de()
@@ -33,7 +34,7 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         $formattedNumber = $numberFormatterWrapper->format($number, self::LOCALE_GERMANY);
 
-        $this->assertEquals('1,99', $formattedNumber);
+        static::assertEquals('1,99', $formattedNumber);
     }
 
     public function test_it_should_add_2_decimal_digits()
@@ -44,7 +45,7 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         $formattedNumber = $numberFormatterWrapper->format($number, self::LOCALE_GERMANY);
 
-        $this->assertEquals('2,00', $formattedNumber);
+        static::assertEquals('2,00', $formattedNumber);
     }
 
     public function test_it_should_format_english_numbers()
@@ -55,7 +56,7 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         $formattedNumber = $numberFormatterWrapper->format($number, self::LOCALE_GREAT_BRITAIN);
 
-        $this->assertEquals('2.00', $formattedNumber);
+        static::assertEquals('2.00', $formattedNumber);
     }
 
     public function test_it_should_throw_exception_if_locale_is_empty()
@@ -76,6 +77,6 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
 
         $formattedNumber = $numberFormatterWrapper->format($number, self::LOCALE_ITALIA);
 
-        $this->assertEquals('2.00', $formattedNumber);
+        static::assertEquals('2.00', $formattedNumber);
     }
 }

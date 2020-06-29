@@ -9,12 +9,8 @@
 namespace SwagBackendOrder\Components\Order;
 
 use Shopware\Models\Order\Order;
-use SwagBackendOrder\Components\Order\Struct\OrderStruct;
 
-interface OrderServiceInterface
+interface B2BOrderServiceInterface
 {
-    /**
-     * @return Order
-     */
-    public function create(OrderStruct $orderStruct);
+    public function createB2BOrder(Order $order): void;
 }

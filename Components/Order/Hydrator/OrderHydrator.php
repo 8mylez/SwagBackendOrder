@@ -17,17 +17,12 @@ class OrderHydrator
      */
     private $positionHydrator;
 
-    /**
-     * @param PositionHydrator $positionHydrator
-     */
     public function __construct(PositionHydrator $positionHydrator)
     {
         $this->positionHydrator = $positionHydrator;
     }
 
     /**
-     * @param \Enlight_Controller_Request_Request $request
-     *
      * @return OrderStruct
      */
     public function hydrateFromRequest(\Enlight_Controller_Request_Request $request)
@@ -61,6 +56,7 @@ class OrderHydrator
         $orderStruct->setTotalWithoutTax((float) $data['totalWithoutTax']);
         $orderStruct->setShippingCostsNet((float) $data['shippingCostsNet']);
         $orderStruct->setShippingCosts((float) $data['shippingCosts']);
+        $orderStruct->setShippingCostsTaxRate((float) $data['shippingCostsTaxRate']);
 
         $orderStruct->setAttributes($data['orderAttribute'][0]);
 

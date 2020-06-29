@@ -8,13 +8,14 @@
 
 namespace SwagBackendOrder\Tests\Functional\PriceCalculation;
 
+use PHPUnit\Framework\TestCase;
 use SwagBackendOrder\Components\PriceCalculation\Calculator\ProductPriceCalculator;
 use SwagBackendOrder\Components\PriceCalculation\Context\PriceContext;
 use SwagBackendOrder\Components\PriceCalculation\CurrencyConverter;
 use SwagBackendOrder\Components\PriceCalculation\TaxCalculation;
 use SwagBackendOrder\Tests\DatabaseTestCaseTrait;
 
-class ProductPriceCalculatorTest extends \PHPUnit_Framework_TestCase
+class ProductPriceCalculatorTest extends TestCase
 {
     use DatabaseTestCaseTrait;
 
@@ -23,7 +24,7 @@ class ProductPriceCalculatorTest extends \PHPUnit_Framework_TestCase
      */
     private $productPriceCalculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->productPriceCalculator = new ProductPriceCalculator(
             new TaxCalculation(),
@@ -36,8 +37,8 @@ class ProductPriceCalculatorTest extends \PHPUnit_Framework_TestCase
         $context = new PriceContext(50.41, 19.00, true, false, 1.3625);
 
         $price = $this->productPriceCalculator->calculate($context);
-        $this->assertEquals(68.68, round($price->getNet(), 2));
-        $this->assertEquals(81.73, round($price->getGross(), 2));
+        static::assertEquals(68.68, round($price->getNet(), 2));
+        static::assertEquals(81.73, round($price->getGross(), 2));
     }
 
     public function testCalculateBasePriceFromGrossPriceWithCurrencyFactor()
@@ -48,7 +49,7 @@ class ProductPriceCalculatorTest extends \PHPUnit_Framework_TestCase
         $context = new PriceContext(81.74, 19.00, $isNetPrice, $isTaxFree, $currencyFactor);
 
         $basePrice = $this->productPriceCalculator->calculateBasePrice($context);
-        $this->assertEquals(50.414000462570343, $basePrice);
+        static::assertEquals(50.414000462570343, $basePrice);
     }
 
     public function testCalculateBasePriceFromNetPrice()
@@ -57,7 +58,7 @@ class ProductPriceCalculatorTest extends \PHPUnit_Framework_TestCase
         $context = new PriceContext(50.00, 19.00, $isNetPrice);
 
         $basePrice = $this->productPriceCalculator->calculateBasePrice($context);
-        $this->assertEquals(50.00, $basePrice);
+        static::assertEquals(50.00, $basePrice);
     }
 
     public function testCalculateBasePriceFromTaxFreePrice()
@@ -67,7 +68,7 @@ class ProductPriceCalculatorTest extends \PHPUnit_Framework_TestCase
         $context = new PriceContext(50.00, 19.00, $isNetPrice, $isTaxFree);
 
         $basePrice = $this->productPriceCalculator->calculateBasePrice($context);
-        $this->assertEquals(50.00, $basePrice);
+        static::assertEquals(50.00, $basePrice);
     }
 
     public function testCalculateBasePriceFromTaxFreePriceWithCurrencyFactor()
@@ -78,6 +79,6 @@ class ProductPriceCalculatorTest extends \PHPUnit_Framework_TestCase
         $context = new PriceContext(50.00, 19.00, $isNetPrice, $isTaxFree, $currencyFactor);
 
         $basePrice = $this->productPriceCalculator->calculateBasePrice($context);
-        $this->assertEquals(25, $basePrice);
+        static::assertEquals(25, $basePrice);
     }
 }

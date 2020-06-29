@@ -51,7 +51,7 @@ class PositionStruct
     private $statusId;
 
     /**
-     * @var int
+     * @var float
      */
     private $taxRate;
 
@@ -69,6 +69,11 @@ class PositionStruct
      * @var float
      */
     private $total;
+
+    /**
+     * @var string|null
+     */
+    private $ean;
 
     /**
      * @return int
@@ -199,7 +204,7 @@ class PositionStruct
     }
 
     /**
-     * @return int
+     * @return float
      */
     public function getTaxRate()
     {
@@ -207,7 +212,7 @@ class PositionStruct
     }
 
     /**
-     * @param int $taxRate
+     * @param float $taxRate
      */
     public function setTaxRate($taxRate)
     {
@@ -276,5 +281,15 @@ class PositionStruct
     public function getDiscountType()
     {
         return (int) explode('.', $this->getNumber())[1];
+    }
+
+    public function getEan(): ?string
+    {
+        return $this->ean;
+    }
+
+    public function setEan(?string $ean): void
+    {
+        $this->ean = $ean;
     }
 }

@@ -8,12 +8,13 @@
 
 namespace SwagBackendOrder\Tests\Functional\PriceCalculation;
 
+use PHPUnit\Framework\TestCase;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Shop\Currency;
 use SwagBackendOrder\Components\PriceCalculation\Context\PriceContextFactory;
 use SwagBackendOrder\Tests\DatabaseTestCaseTrait;
 
-class PriceContextFactoryTest extends \PHPUnit_Framework_TestCase
+class PriceContextFactoryTest extends TestCase
 {
     use DatabaseTestCaseTrait;
 
@@ -22,7 +23,7 @@ class PriceContextFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private $SUT;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->SUT = new PriceContextFactory($this->getModelManager());
     }
@@ -38,10 +39,10 @@ class PriceContextFactoryTest extends \PHPUnit_Framework_TestCase
 
         $priceContext = $this->SUT->create($price, $taxRate, $isNet, $taxFree, $currencyId);
 
-        $this->assertEquals($price, $priceContext->getPrice());
-        $this->assertEquals($taxRate, $priceContext->getTaxRate());
-        $this->assertEquals($isNet, $priceContext->isNetPrice());
-        $this->assertEquals($currency->getFactor(), $priceContext->getCurrencyFactor());
+        static::assertEquals($price, $priceContext->getPrice());
+        static::assertEquals($taxRate, $priceContext->getTaxRate());
+        static::assertEquals($isNet, $priceContext->isNetPrice());
+        static::assertEquals($currency->getFactor(), $priceContext->getCurrencyFactor());
     }
 
     public function testCreateWithInvalidNumbers()
@@ -67,7 +68,7 @@ class PriceContextFactoryTest extends \PHPUnit_Framework_TestCase
 
         $priceContext = $this->SUT->create($price, $taxRate, $isNet, $taxFree, $invalidCurrencyId);
 
-        $this->assertEquals($defaultCurrencyFactor, $priceContext->getCurrencyFactor());
+        static::assertEquals($defaultCurrencyFactor, $priceContext->getCurrencyFactor());
     }
 
     /**

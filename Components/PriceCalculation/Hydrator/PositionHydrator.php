@@ -13,8 +13,6 @@ use SwagBackendOrder\Components\PriceCalculation\Struct\PositionStruct;
 class PositionHydrator
 {
     /**
-     * @param array $data
-     *
      * @return PositionStruct
      */
     public function hydrate(array $data)
@@ -23,7 +21,7 @@ class PositionHydrator
         $position->setPrice((float) $data['price']);
         $position->setQuantity((int) $data['quantity']);
         $position->setTotal((float) $data['total']);
-        $position->setTaxRate((int) $data['taxRate']);
+        $position->setTaxRate((float) $data['taxRate']);
         $position->setIsDiscount((bool) $data['isDiscount']);
         $position->setDiscountType((int) $data['discountType']);
 

@@ -1,6 +1,6 @@
 //
-//{block name="backend/create_backend_order/view/total_costs_overview"}
-//{namespace name="backend/swag_backend_order/view/costs_overview"}
+// {block name="backend/create_backend_order/view/total_costs_overview"}
+// {namespace name="backend/swag_backend_order/view/costs_overview"}
 Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
 
     extend: 'Ext.container.Container',
@@ -77,7 +77,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
 
         me.callParent(arguments);
 
-        //Firefox bugfix for get the correct currency symbol
+        // Firefox bugfix for get the correct currency symbol
         if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
             me.updateCurrency();
         }
@@ -243,7 +243,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
                 pack: 'end'
             },
             style: {
-                paddingRight: '20px',
+                paddingRight: '20px'
             },
             height: 100,
             overflowY: 'auto',
@@ -350,7 +350,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
                     '<p>' + me.snippets.taxSum + '</p>',
                 '</tpl>',
                 '</div>',
-            '</tpl>{/literal}',
+            '</tpl>{/literal}'
         );
 
         return me.totalLabelTempalte;
@@ -378,9 +378,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
             '</tpl>{/literal}',
             {
                 shippingCosts: function(shippingCosts) {
-                    if (me.displayNetCheckbox.getValue())
-                    // Show net shipping costs if net order
+                    if (me.displayNetCheckbox.getValue()) {
+                        // Show net shipping costs if net order
                         return me.totalCostsModel.get('shippingCostsNet');
+                    }
 
                     return shippingCosts;
                 },
@@ -511,7 +512,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
         currencyIndex = me.currencyStore.findExact('selected', 1);
         currencyModel = me.currencyStore.getAt(currencyIndex);
 
-        if (typeof currencyModel !== "undefined") {
+        if (typeof currencyModel !== 'undefined') {
             me.currencySymbol = currencyModel.get('symbol');
             me.totalCostsView.tpl = me.createTotalCostsTemplate();
             me.overviewPriceView.tpl = me.createOverviewPriceTemplate();

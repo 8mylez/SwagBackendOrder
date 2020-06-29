@@ -17,25 +17,13 @@ class PaymentTranslator
      */
     private $translationComponent;
 
-    /**
-     * @param Shopware_Components_Translation $translationComponent
-     */
     public function __construct(Shopware_Components_Translation $translationComponent)
     {
         $this->translationComponent = $translationComponent;
     }
 
     /**
-     * @return PaymentTranslator
-     */
-    public static function create()
-    {
-        return new self(new Shopware_Components_Translation());
-    }
-
-    /**
-     * @param array $paymentMethod
-     * @param int   $languageId
+     * @param int $languageId
      *
      * @return array
      */

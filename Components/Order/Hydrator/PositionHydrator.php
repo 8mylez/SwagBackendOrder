@@ -13,8 +13,6 @@ use SwagBackendOrder\Components\Order\Struct\PositionStruct;
 class PositionHydrator
 {
     /**
-     * @param array $data
-     *
      * @return PositionStruct
      */
     public function hydrate(array $data)
@@ -28,10 +26,11 @@ class PositionHydrator
         $positionStruct->setName((string) $data['articleName']);
         $positionStruct->setQuantity((int) $data['quantity']);
         $positionStruct->setStatusId((int) $data['statusId']);
-        $positionStruct->setTaxRate((int) $data['taxRate']);
+        $positionStruct->setTaxRate((float) $data['taxRate']);
         $positionStruct->setTaxId((int) $data['taxId']);
         $positionStruct->setPrice((float) $data['price']);
         $positionStruct->setTotal((float) $data['total']);
+        $positionStruct->setEan((string) $data['ean']);
 
         return $positionStruct;
     }

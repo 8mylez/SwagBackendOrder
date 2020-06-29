@@ -517,6 +517,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 }
 
                 record.set('blockPrices', result.blockPrices);
+                editor.context.record.set('ean', result.ean);
 
                 /**
                  * columns[0] -> selected
@@ -1159,6 +1160,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
                 me.orderModel.set('shippingCostsNet', record.shippingCostsNet);
                 me.orderModel.set('shippingCosts', record.shippingCosts);
+                me.orderModel.set('shippingCostsTaxRate', record.shippingCostsTaxRate);
                 // Update shipping costs fields
                 if (me.shippingCostsFields !== undefined) {
                     me.shippingCostsFields[0].suspendEvents();
@@ -1167,6 +1169,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.shippingCostsFields[1].setValue(record.shippingCostsNet);
                     me.shippingCostsFields[0].resumeEvents();
                     me.shippingCostsFields[1].resumeEvents();
+                    me.shippingCostsFields[2].setValue(record.shippingCostsTaxRate);
                 }
 
                 // Update position records
@@ -1189,6 +1192,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                     me.totalCostsModel.set('total', record.total);
                     me.totalCostsModel.set('shippingCosts', record.shippingCosts);
                     me.totalCostsModel.set('shippingCostsNet', record.shippingCostsNet);
+                    me.totalCostsModel.set('shippingCostsTaxRate', record.shippingCostsTaxRate);
                     me.totalCostsModel.set('taxSum', record.taxSum);
                     me.totalCostsModel.set('taxes', record.taxes);
                     me.totalCostsModel.set('proportionalTaxCalculation', record.proportionalTaxCalculation);

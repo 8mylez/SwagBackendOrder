@@ -8,11 +8,12 @@
 
 namespace SwagBackendOrder\Tests\Functional\Order;
 
+use PHPUnit\Framework\TestCase;
 use SwagBackendOrder\Components\Order\Validator\Validators\ProductContext;
 use SwagBackendOrder\Components\Order\Validator\Validators\ProductValidator;
 use SwagBackendOrder\Tests\DatabaseTestCaseTrait;
 
-class ProductValidatorTest extends \PHPUnit_Framework_TestCase
+class ProductValidatorTest extends TestCase
 {
     use DatabaseTestCaseTrait;
 
@@ -24,7 +25,7 @@ class ProductValidatorTest extends \PHPUnit_Framework_TestCase
         $context = new ProductContext($this->getProductNumberWithActivatedOnSale(), $quantity);
         $violation = $validator->validate($context);
 
-        $this->assertContains($this->getProductNumberWithActivatedOnSale(), $violation->getMessages()[0]);
+        static::assertStringContainsString($this->getProductNumberWithActivatedOnSale(), $violation->getMessages()[0]);
     }
 
     /**

@@ -10,13 +10,16 @@ namespace SwagBackendOrder\Tests\Functional\Controller;
 
 require_once __DIR__ . '/../../../Controllers/Backend/SwagBackendOrder.php';
 
+use PHPUnit\Framework\TestCase;
 use Shopware\Components\DependencyInjection\Container;
 use SwagBackendOrder\Components\PriceCalculation\DiscountType;
+use SwagBackendOrder\Tests\B2bOrderTrait;
 use SwagBackendOrder\Tests\DatabaseTestCaseTrait;
 
-class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
+class SwagBackendOrderTest extends TestCase
 {
     use DatabaseTestCaseTrait;
+    use B2bOrderTrait;
 
     public function testCalculateBasket()
     {
@@ -31,12 +34,12 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals(142.43, $result['totalWithoutTax']);
-        $this->assertEquals(154.94, $result['sum']);
-        $this->assertEquals(16.4, round($result['taxSum'], 1));
-        $this->assertEquals(59.99, $result['positions'][0]['price']);
-        $this->assertEquals(59.99, $result['positions'][0]['total']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals(142.43, $result['totalWithoutTax']);
+        static::assertEquals(154.94, $result['sum']);
+        static::assertEquals(16.4, round($result['taxSum'], 1));
+        static::assertEquals(59.99, $result['positions'][0]['price']);
+        static::assertEquals(59.99, $result['positions'][0]['total']);
     }
 
     public function testCalculateBasket_with_empty_dispatchId()
@@ -52,9 +55,9 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals(3.9, $result['shippingCosts']);
-        $this->assertEquals(3.9, $result['shippingCostsNet']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals(3.9, $result['shippingCosts']);
+        static::assertEquals(3.9, $result['shippingCostsNet']);
     }
 
     public function testCalculateBasket_with_invalid_dispatchId()
@@ -84,9 +87,9 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
         Shopware()->Front()->Router()->assemble();
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals(3.9, $result['shippingCosts']);
-        $this->assertEquals(3.9, $result['shippingCostsNet']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals(3.9, $result['shippingCosts']);
+        static::assertEquals(3.9, $result['shippingCostsNet']);
     }
 
     public function testBasketCalculationWithChangedDisplayNetFlag()
@@ -102,18 +105,18 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals(50.41, round($result['sum'], 2));
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals(50.41, round($result['sum'], 2));
 
-        $this->assertEquals(3.90, $result['shippingCosts']);
-        $this->assertEquals(3.28, $result['shippingCostsNet']);
+        static::assertEquals(3.90, $result['shippingCosts']);
+        static::assertEquals(3.28, $result['shippingCostsNet']);
 
-        $this->assertEquals(10.20, $result['taxSum']);
+        static::assertEquals(10.20, $result['taxSum']);
 
-        $this->assertEquals(63.89, $result['total']);
-        $this->assertEquals(53.69, $result['totalWithoutTax']);
+        static::assertEquals(63.89, $result['total']);
+        static::assertEquals(53.69, $result['totalWithoutTax']);
 
-        $this->assertEquals(50.41, round($result['positions'][0]['price'], 2));
+        static::assertEquals(50.41, round($result['positions'][0]['price'], 2));
     }
 
     public function testBasketCalculationWithChangedTaxfreeFlag()
@@ -129,18 +132,18 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals(50.41, round($result['sum'], 2));
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals(50.41, round($result['sum'], 2));
 
-        $this->assertEquals(3.28, $result['shippingCosts']);
-        $this->assertEquals(3.28, $result['shippingCostsNet']);
+        static::assertEquals(3.28, $result['shippingCosts']);
+        static::assertEquals(3.28, $result['shippingCostsNet']);
 
-        $this->assertEquals(0, $result['taxSum']);
+        static::assertEquals(0, $result['taxSum']);
 
-        $this->assertEquals(53.69, $result['total']);
-        $this->assertEquals(53.69, $result['totalWithoutTax']);
+        static::assertEquals(53.69, $result['total']);
+        static::assertEquals(53.69, $result['totalWithoutTax']);
 
-        $this->assertEquals(50.41, round($result['positions'][0]['price'], 2));
+        static::assertEquals(50.41, round($result['positions'][0]['price'], 2));
     }
 
     public function testBasketCalculationWithChangedCurrency()
@@ -156,19 +159,19 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals(271.08, $result['sum']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals(271.08, $result['sum']);
 
-        $this->assertEquals(5.31, $result['shippingCosts']);
-        $this->assertEquals(4.47, $result['shippingCostsNet']);
+        static::assertEquals(5.31, $result['shippingCosts']);
+        static::assertEquals(4.47, $result['shippingCostsNet']);
 
-        $this->assertEquals(41.68, $result['taxSum']);
+        static::assertEquals(41.68, $result['taxSum']);
 
-        $this->assertEquals(276.39, $result['total']);
-        $this->assertEquals(234.71, $result['totalWithoutTax']);
+        static::assertEquals(276.39, $result['total']);
+        static::assertEquals(234.71, $result['totalWithoutTax']);
 
-        $this->assertEquals(81.74, round($result['positions'][0]['price'], 2));
-        $this->assertEquals(245.21, round($result['positions'][0]['total'], 2));
+        static::assertEquals(81.74, round($result['positions'][0]['price'], 2));
+        static::assertEquals(245.21, round($result['positions'][0]['total'], 2));
     }
 
     public function testGetProduct()
@@ -184,9 +187,9 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals('SW10002.1', $result['number']);
-        $this->assertEquals(59.99, $result['price']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals('SW10002.1', $result['number']);
+        static::assertEquals(59.99, $result['price']);
     }
 
     public function test_getDiscount_absolute()
@@ -201,17 +204,17 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals('Test_absolute', $result['articleName']);
-        $this->assertEquals('DISCOUNT.1', $result['articleNumber']);
-        $this->assertEquals(0, $result['articleId']);
-        $this->assertEquals(-50.0, $result['price']);
-        $this->assertEquals(4, $result['mode']);
-        $this->assertEquals(1, $result['quantity']);
-        $this->assertEquals(1, $result['inStock']);
-        $this->assertTrue($result['isDiscount']);
-        $this->assertEquals(DiscountType::DISCOUNT_ABSOLUTE, $result['discountType']);
-        $this->assertEquals(-50.0, $result['total']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals('Test_absolute', $result['articleName']);
+        static::assertEquals('DISCOUNT.1', $result['articleNumber']);
+        static::assertEquals(0, $result['articleId']);
+        static::assertEquals(-50.0, $result['price']);
+        static::assertEquals(4, $result['mode']);
+        static::assertEquals(1, $result['quantity']);
+        static::assertEquals(1, $result['inStock']);
+        static::assertTrue($result['isDiscount']);
+        static::assertEquals(DiscountType::DISCOUNT_ABSOLUTE, $result['discountType']);
+        static::assertEquals(-50.0, $result['total']);
     }
 
     public function test_getDiscount_percentage()
@@ -226,17 +229,17 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals('Test_percentage', $result['articleName']);
-        $this->assertEquals('DISCOUNT.0', $result['articleNumber']);
-        $this->assertEquals(0, $result['articleId']);
-        $this->assertEquals(-10.0, $result['price']);
-        $this->assertEquals(4, $result['mode']);
-        $this->assertEquals(1, $result['quantity']);
-        $this->assertEquals(1, $result['inStock']);
-        $this->assertTrue($result['isDiscount']);
-        $this->assertEquals(DiscountType::DISCOUNT_PERCENTAGE, $result['discountType']);
-        $this->assertEquals(-10.0, $result['total']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals('Test_percentage', $result['articleName']);
+        static::assertEquals('DISCOUNT.0', $result['articleNumber']);
+        static::assertEquals(0, $result['articleId']);
+        static::assertEquals(-10.0, $result['price']);
+        static::assertEquals(4, $result['mode']);
+        static::assertEquals(1, $result['quantity']);
+        static::assertEquals(1, $result['inStock']);
+        static::assertTrue($result['isDiscount']);
+        static::assertEquals(DiscountType::DISCOUNT_PERCENTAGE, $result['discountType']);
+        static::assertEquals(-10.0, $result['total']);
     }
 
     public function test_getDiscount_absolute_will_fail_due_to_invalid_amount()
@@ -249,7 +252,7 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
         $controller = $this->getControllerMock($request, $view);
         $controller->getDiscountAction();
 
-        $this->assertFalse($view->getAssign('success'));
+        static::assertFalse($view->getAssign('success'));
     }
 
     public function test_getProduct_with_block_prices()
@@ -265,11 +268,11 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
+        static::assertTrue($view->getAssign('success'));
         $blockPrices = $result['blockPrices'];
         $expectedBlockPricesJSON = '{"1":{"net":0.84,"gross":1},"11":{"net":0.76,"gross":0.9},"21":{"net":0.67,"gross":0.8},"31":{"net":0.63,"gross":0.75},"41":{"net":0.59,"gross":0.7}}';
-        $this->assertEquals($expectedBlockPricesJSON, $blockPrices);
-        $this->assertEquals(0.9044, $result['price']);
+        static::assertEquals($expectedBlockPricesJSON, $blockPrices);
+        static::assertEquals(0.9044, $result['price']);
     }
 
     public function testGetProductWithDisplayNet()
@@ -285,9 +288,9 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertEquals('SW10002.1', $result['number']);
-        $this->assertEquals(50.41, $result['price']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertEquals('SW10002.1', $result['number']);
+        static::assertEquals(50.41, $result['price']);
     }
 
     public function test_getProduct_with_block_prices_and_display_net()
@@ -303,11 +306,11 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
+        static::assertTrue($view->getAssign('success'));
         $blockPrices = $result['blockPrices'];
         $expectedBlockPricesJSON = '{"1":{"net":0.84,"gross":1},"11":{"net":0.76,"gross":0.9},"21":{"net":0.67,"gross":0.8},"31":{"net":0.63,"gross":0.75},"41":{"net":0.59,"gross":0.7}}';
-        $this->assertEquals($expectedBlockPricesJSON, $blockPrices);
-        $this->assertEquals(0.76, $result['price']);
+        static::assertEquals($expectedBlockPricesJSON, $blockPrices);
+        static::assertEquals(0.76, $result['price']);
     }
 
     public function test_getCustomer_list()
@@ -338,9 +341,15 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertSame(1, $view->getAssign('total'));
-        $this->assertArraySubset($expectedUser, $result);
+        static::assertTrue($view->getAssign('success'));
+        static::assertSame(1, $view->getAssign('total'));
+        static::assertSame($expectedUser['email'], $result['email']);
+        static::assertSame($expectedUser['firstname'], $result['firstname']);
+        static::assertSame($expectedUser['lastname'], $result['lastname']);
+        static::assertSame($expectedUser['number'], $result['number']);
+        static::assertSame($expectedUser['company'], $result['company']);
+        static::assertSame($expectedUser['zipCode'], $result['zipCode']);
+        static::assertSame($expectedUser['city'], $result['city']);
     }
 
     public function test_getCustomer_single()
@@ -363,8 +372,11 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertArraySubset($expectedUser, $result);
+        static::assertTrue($view->getAssign('success'));
+        static::assertSame($expectedUser['email'], $result['email']);
+        static::assertSame($expectedUser['firstname'], $result['firstname']);
+        static::assertSame($expectedUser['lastname'], $result['lastname']);
+        static::assertSame($expectedUser['number'], $result['number']);
     }
 
     public function test_getArticles()
@@ -380,9 +392,9 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertCount(1, $result);
-        $this->assertEquals('SW10239', $result[0]['number']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertCount(1, $result);
+        static::assertEquals('SW10239', $result[0]['number']);
     }
 
     public function test_getArticles_multiple()
@@ -400,9 +412,9 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertCount(35, $result);
-        $this->assertEquals('SW10153.1', $result[0]['number']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertCount(35, $result);
+        static::assertEquals('SW10153.1', $result[0]['number']);
     }
 
     public function test_getArticles_by_ordernumber()
@@ -423,9 +435,9 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertCount(1, $result);
-        $this->assertEquals('SW_10002_test_123', $result[0]['number']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertCount(1, $result);
+        static::assertEquals('SW_10002_test_123', $result[0]['number']);
     }
 
     public function test_getArticles_by_supplier()
@@ -446,9 +458,68 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
         $result = $view->getAssign('data');
 
-        $this->assertTrue($view->getAssign('success'));
-        $this->assertCount(1, $result);
-        $this->assertEquals('SW_10002_test_123', $result[0]['number']);
+        static::assertTrue($view->getAssign('success'));
+        static::assertCount(1, $result);
+        static::assertEquals('SW_10002_test_123', $result[0]['number']);
+    }
+
+    public function test_createOrder_withEAN()
+    {
+        $requestHeaderData = require __DIR__ . '/_fixtures/HeaderData.php';
+        $view = $this->getView();
+        $request = new \Enlight_Controller_Request_RequestTestCase();
+        $request->setParams($requestHeaderData);
+
+        $controller = $this->getControllerMock($request, $view);
+        $controller->createOrderAction();
+
+        $viewResult = $view->getAssign();
+        static::assertTrue($viewResult['success']);
+        static::assertNotEmpty($viewResult['orderId']);
+        static::assertNotEmpty($viewResult['ordernumber']);
+
+        $sql = 'SELECT ean FROM s_order_details WHERE orderID = ?';
+        $result = Shopware()->Container()->get('dbal_connection')->fetchColumn($sql, [$viewResult['orderId']]);
+        static::assertSame('UnitTestEAN', $result);
+
+        $b2bResult = $this->getB2bOrder($viewResult['ordernumber']);
+        static::assertNull($b2bResult);
+    }
+
+    public function test_createOrder_withB2bOrder()
+    {
+        $isB2bPluginInstalled = $this->isB2bPluginInstalled();
+
+        if (!$isB2bPluginInstalled) {
+            static::markTestSkipped('SwagB2bPlugin is not installed');
+        }
+
+        $this->b2bUserIsDebitor();
+
+        $requestHeaderData = require __DIR__ . '/_fixtures/HeaderData.php';
+        $requestHeaderData['data']['customerId'] = 2;
+
+        $view = $this->getView();
+        $request = new \Enlight_Controller_Request_RequestTestCase();
+        $request->setParams($requestHeaderData);
+
+        $controller = $this->getControllerMock($request, $view);
+        $controller->createOrderAction();
+
+        $viewResult = $view->getAssign();
+        static::assertTrue($viewResult['success']);
+        static::assertNotEmpty($viewResult['orderId']);
+        static::assertNotEmpty($viewResult['ordernumber']);
+
+        $sql = 'SELECT ean FROM s_order_details WHERE orderID = ?';
+        $result = Shopware()->Container()->get('dbal_connection')->fetchColumn($sql, [$viewResult['orderId']]);
+
+        static::assertSame('UnitTestEAN', $result);
+
+        $b2bResult = $this->getB2bOrder($viewResult['ordernumber']);
+        static::assertNotNull($b2bResult);
+        static::assertCount(1, $b2bResult);
+        static::assertSame($viewResult['ordernumber'], $b2bResult[0]['ordernumber']);
     }
 
     /**
@@ -703,11 +774,6 @@ class SwagBackendOrderTest extends \PHPUnit_Framework_TestCase
 
 class SwagBackendOrderMock extends \Shopware_Controllers_Backend_SwagBackendOrder
 {
-    /**
-     * @param \Enlight_Controller_Request_RequestTestCase $request
-     * @param Container                                   $container
-     * @param \Enlight_View_Default                       $view
-     */
     public function __construct(
         \Enlight_Controller_Request_RequestTestCase $request,
         Container $container,

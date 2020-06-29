@@ -8,9 +8,10 @@
 
 namespace SwagBackendOrder\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use SwagBackendOrder\Components\PriceCalculation\TaxCalculation;
 
-class TaxCalculationTest extends \PHPUnit_Framework_TestCase
+class TaxCalculationTest extends TestCase
 {
     public function testGetNetPrice()
     {
@@ -20,7 +21,7 @@ class TaxCalculationTest extends \PHPUnit_Framework_TestCase
         $taxCalculation = $this->getTaxCalculation();
         $netPrice = $taxCalculation->getNetPrice($grossPrice, $taxRate);
 
-        $this->assertEquals(50.411764705882355, $netPrice);
+        static::assertEquals(50.411764705882355, $netPrice);
     }
 
     public function testGetGrossPrice()
@@ -31,7 +32,7 @@ class TaxCalculationTest extends \PHPUnit_Framework_TestCase
         $taxCalculation = $this->getTaxCalculation();
         $grossPrice = $taxCalculation->getGrossPrice($netPrice, $taxRate);
 
-        $this->assertEquals(59.9879, $grossPrice);
+        static::assertEquals(59.9879, $grossPrice);
     }
 
     /**

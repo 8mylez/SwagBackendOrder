@@ -43,11 +43,12 @@ trait KernelTestCaseTrait
 
         self::$kernel->getContainer()->get('dbal_connection')->beginTransaction();
 
-        /** @var $repository \Shopware\Models\Shop\Repository */
+        /** @var \Shopware\Models\Shop\Repository $repository */
         $repository = Shopware()->Container()->get('models')->getRepository(Shop::class);
 
-        $shop = $repository->getActiveDefault();
-        $shop->registerResources();
+        self::$kernel->getContainer()->get('shopware.components.shop_registration_service')->registerResources(
+            $repository->getActiveDefault()
+        );
     }
 
     /**
