@@ -116,7 +116,7 @@ class OrderFactory
 
         if ($orderStruct->getNetOrder()) {
             $shippingCosts = 0.0;
-            $shippingCosts = $orderStruct->getShippingCostsNet() * 1.19;
+            $shippingCosts = $orderStruct->getShippingCostsNet() * 1.16;
             $order->setInvoiceShipping($shippingCosts);
         }
 
